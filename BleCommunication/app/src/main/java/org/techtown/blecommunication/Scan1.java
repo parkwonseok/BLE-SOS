@@ -25,16 +25,17 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.Vector;
 
 public class Scan1 extends AppCompatActivity {
     public static final int REQUEST_SCAN2_ACTIVITY = 202;   // Scan2 액티비티 요청 상수
-    String TAG = "리스트 크기는";
     // Scan 준비
     BluetoothManager bleManager;
     BluetoothAdapter bleAdapter;
     BluetoothLeScanner bleScanner;
     BluetoothDevice device;
+    ArrayList<BluetoothDevice> bleDevices;
     ScanSettings.Builder mScanSettings;
     List<ScanFilter> scanFilters;
 
@@ -55,6 +56,7 @@ public class Scan1 extends AppCompatActivity {
 
         listView = (ListView)findViewById(R.id.listDevice);
         listDevice = new ArrayList<HashMap<String, String>>();
+        bleDevices = new ArrayList<>();
 
         // 심플 리스트뷰 어댑터
         simpleAdapter = new SimpleAdapter(
@@ -72,6 +74,7 @@ public class Scan1 extends AppCompatActivity {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                device = bleDevices.get(position);
                 device.createBond();   // 조난신호 보낸 장치와 페어링
                 stopScaning();   // Scan 중지
 
@@ -95,13 +98,14 @@ public class Scan1 extends AppCompatActivity {
             String serviceData = str.substring(25);
             int rssi = result.getRssi();
             double distance = getDistance(-56, rssi);
-            device = result.getDevice();   // 조난신호를 보낸 장치
+            //device = result.getDevice();   // 조난신호를 보낸 장치
 
             inputData = new HashMap<String, String>();
             inputData.put("data", "패킷데이터 : " + serviceData);
             inputData.put("distance", "거리 : " + Double.toString(distance).substring(0, 4));
 
             if(listDevice.size() == 0){
+                bleDevices.add(result.getDevice());
                 listDevice.add(inputData);
             }
             for(int i= 0 ; i<listDevice.size(); i++){
@@ -111,6 +115,7 @@ public class Scan1 extends AppCompatActivity {
                     break;
                 }
                 else{
+                    bleDevices.add(result.getDevice());
                     listDevice.add(inputData);
                 }
             }
