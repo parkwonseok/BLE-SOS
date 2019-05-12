@@ -10,10 +10,12 @@ import android.bluetooth.le.ScanResult;
 import android.bluetooth.le.ScanSettings;
 import android.content.Context;
 import android.content.Intent;
+import android.nfc.Tag;
 import android.os.AsyncTask;
 import android.os.ParcelUuid;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -27,7 +29,7 @@ import java.util.Vector;
 
 public class Scan1 extends AppCompatActivity {
     public static final int REQUEST_SCAN2_ACTIVITY = 202;   // Scan2 액티비티 요청 상수
-
+    String TAG = "리스트 크기는";
     // Scan 준비
     BluetoothManager bleManager;
     BluetoothAdapter bleAdapter;
@@ -40,6 +42,7 @@ public class Scan1 extends AppCompatActivity {
     ArrayList<HashMap<String,String>> listDevice;
     HashMap<String,String> inputData;
     ListView listView;
+    SimpleAdapter simpleAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,8 +56,34 @@ public class Scan1 extends AppCompatActivity {
         listView = (ListView)findViewById(R.id.listDevice);
         listDevice = new ArrayList<HashMap<String, String>>();
 
+        // 심플 리스트뷰 어댑터
+        simpleAdapter = new SimpleAdapter(
+                getApplicationContext(),
+                listDevice,
+                android.R.layout.simple_list_item_2,
+                new String[]{"data", "distance"},
+                new int[]{android.R.id.text1,android.R.id.text2});
+        listView.setAdapter(simpleAdapter);
+
         // Scan 시작
         startScanning();
+
+        // 리스트뷰 목록에서 탐색된 장치 클릭시
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                device.createBond();   // 조난신호 보낸 장치와 페어링
+                stopScaning();   // Scan 중지
+
+                // Scan2 액티비티로 전환
+                Intent intent = new Intent(getApplicationContext(), Scan2.class);
+                // Scan2 액티비티로 조난자 정보 넘겨줌
+                String scanData = listDevice.get(position).toString();
+                ScanInfo scanInfo = new ScanInfo(scanData);
+                intent.putExtra("scan", scanInfo);
+                startActivityForResult(intent, REQUEST_SCAN2_ACTIVITY);
+            }
+        });
     }
 
     // Scan 결과 반환 함수
@@ -64,43 +93,29 @@ public class Scan1 extends AppCompatActivity {
             // 패킷에 담긴 조난자 정보
             String str = new String(result.getScanRecord().getBytes(), Charset.forName("UTF-8"));
             String serviceData = str.substring(25);
-
-            // 리스트뷰 목록에 넣을 정보
-            device = result.getDevice();   // 조난신호를 보낸 장치
             int rssi = result.getRssi();
             double distance = getDistance(-56, rssi);
+            device = result.getDevice();   // 조난신호를 보낸 장치
+
             inputData = new HashMap<String, String>();
             inputData.put("data", "패킷데이터 : " + serviceData);
             inputData.put("distance", "거리 : " + Double.toString(distance).substring(0, 4));
-            listDevice.add(inputData);
 
-            // 심플 리스트뷰 어댑터
-            SimpleAdapter simpleAdapter = new SimpleAdapter(
-                    getApplicationContext(),
-                    listDevice,
-                    android.R.layout.simple_list_item_2,
-                    new String[]{"data", "distance"},
-                    new int[]{android.R.id.text1,android.R.id.text2});
-            listView.setAdapter(simpleAdapter);
+            if(listDevice.size() == 0){
+                listDevice.add(inputData);
+            }
+            for(int i= 0 ; i<listDevice.size(); i++){
+
+                if(listDevice.get(i).get("data").equals(inputData.get("data"))){
+                    listDevice.set(i, inputData);
+                    break;
+                }
+                else{
+                    listDevice.add(inputData);
+                }
+            }
             // 리스트뷰 갱신
             simpleAdapter.notifyDataSetChanged();
-
-            // 리스트뷰 목록에서 탐색된 장치 클릭시
-            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    device.createBond();   // 조난신호 보낸 장치와 페어링
-                    stopScaning();   // Scan 중지
-
-                    // Scan2 액티비티로 전환
-                    Intent intent = new Intent(getApplicationContext(), Scan2.class);
-                    // Scan2 액티비티로 조난자 정보 넘겨줌
-                    String scanData = listDevice.get(position).toString();
-                    ScanInfo scanInfo = new ScanInfo(scanData);
-                    intent.putExtra("scan", scanInfo);
-                    startActivityForResult(intent, REQUEST_SCAN2_ACTIVITY);
-                }
-            });
         }
     };
 
