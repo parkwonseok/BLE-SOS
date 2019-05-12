@@ -17,7 +17,7 @@ import android.app.AlertDialog;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-
+//내용바꾸기
 public class MainActivity extends AppCompatActivity {
     public static final int REQUEST_ADVERTISE1_ACTIVITY = 101;   // Advertise1 액티비티 요청 상수
     public static final int REQUEST_SCAN1_ACTIVITY = 201;   // Scan1 액티비티 요청 상수
