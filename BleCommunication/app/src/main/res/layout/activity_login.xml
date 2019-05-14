@@ -157,8 +157,12 @@
     <Button
         android:id="@+id/btSave"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="70dp"
         android:layout_marginBottom="8dp"
-        android:text="저장하기" />
+        android:background="@drawable/btn"
+        android:text="저장하기"
+        android:textColor="@android:color/background_light"
+        android:textSize="24sp"
+        android:textStyle="bold" />
 
 </android.support.v7.widget.LinearLayoutCompat>

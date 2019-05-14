@@ -71,6 +71,7 @@ public class Advertise2 extends AppCompatActivity {
         Intent intent = getIntent();
         getIntentData(intent);
 
+        bleAdapter.setName(serviceData);
         // Advertising 시작
         startAdvertising();
 
@@ -130,7 +131,7 @@ public class Advertise2 extends AppCompatActivity {
             Bundle bundle = intent.getExtras();
             AdvertiseInfo advertiseInfo = bundle.getParcelable("Data");   // 이전 액티비티에서의 조난자 정보를 합쳐 문자열 변수에 저장
             if (intent != null) {
-                final String str = advertiseInfo.num + advertiseInfo.time + advertiseInfo.sick + advertiseInfo.battery;
+                final String str = "ID0000" + advertiseInfo.num + advertiseInfo.time + advertiseInfo.sick + advertiseInfo.battery;
                 serviceData = str;
             }
         }
@@ -157,10 +158,10 @@ public class Advertise2 extends AppCompatActivity {
 
         // Advertising 패킷에 넣을 데이터
         bleAdvertiseData = new AdvertiseData.Builder()
-                .setIncludeDeviceName(false)   // 디바이스 이름 넣을 경우 : true
+                .setIncludeDeviceName(true)   // 디바이스 이름 넣을 경우 : true
                 .setIncludeTxPowerLevel(false)   // 신호 세기 넣을 경우 : true
-                .addServiceUuid(pUuid)   // id
-                .addServiceData(pUuid, serviceData.getBytes(Charset.forName("UTF-8")))   // 조난자 정보 넣기
+                //.addServiceUuid(pUuid)   // id
+                //.addServiceData(pUuid, serviceData.getBytes(Charset.forName("UTF-8")))   // 조난자 정보 넣기
                 .build();
 
         bleAdvertiser.startAdvertising(bleAdvertiseSettings, bleAdvertiseData, bleAdvertiseCallback);   // advertise 시작

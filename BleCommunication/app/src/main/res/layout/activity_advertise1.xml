@@ -40,7 +40,7 @@
             android:layout_width="200dp"
             android:layout_height="70dp"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="16dp"
             android:layout_marginEnd="8dp"
             android:background="@drawable/btn"
             android:text="조난신호 송신"
@@ -50,7 +50,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.497"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/sickCheck4" />
+            app:layout_constraintTop_toBottomOf="@+id/imageView11" />
 
 
         <TextView
@@ -59,7 +59,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
             android:layout_marginTop="32dp"
-            android:text="조난인원"
+            android:text=" 조난인원"
             android:textColor="@android:color/background_dark"
             android:textSize="24sp"
             android:textStyle="bold"
@@ -67,96 +67,17 @@
             app:layout_constraintTop_toBottomOf="@+id/imageView3" />
 
         <TextView
-            android:id="@+id/textView5"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="30dp"
-            android:text="조난시간"
-            android:textColor="@android:color/background_dark"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView3" />
-
-        <TextView
             android:id="@+id/textView4"
             android:layout_width="114dp"
             android:layout_height="59dp"
             android:layout_marginStart="20dp"
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="50dp"
             android:text=" 현재상태\n(중복가능)"
             android:textColor="@android:color/background_dark"
             android:textSize="24sp"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/radioGroup" />
-
-        <RadioGroup
-            android:id="@+id/radioGroup"
-            android:layout_width="185dp"
-            android:layout_height="256dp"
-            android:layout_marginTop="25dp"
-            android:layout_marginEnd="40dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/editNum">
-
-            <RadioButton
-                android:id="@+id/timeRadio1"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="1시간" />
-
-            <RadioButton
-                android:id="@+id/timeRadio2"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="2시간" />
-
-            <RadioButton
-                android:id="@+id/timeRadio3"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="4시간" />
-
-            <RadioButton
-                android:id="@+id/timeRadio4"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="8시간" />
-
-            <RadioButton
-                android:id="@+id/timeRadio5"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="12시간" />
-
-            <RadioButton
-                android:id="@+id/timeRadio6"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="24시간" />
-
-            <RadioButton
-                android:id="@+id/timeRadio7"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="48시간" />
-
-            <RadioButton
-                android:id="@+id/timeRadio8"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="48시간 이상" />
-        </RadioGroup>
+            app:layout_constraintTop_toBottomOf="@+id/textView3" />
 
         <ImageView
             android:id="@+id/imageView3"
@@ -172,11 +93,11 @@
             android:id="@+id/sickCheck1"
             android:layout_width="185dp"
             android:layout_height="30dp"
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="39dp"
             android:layout_marginEnd="40dp"
             android:text="골절"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/radioGroup" />
+            app:layout_constraintTop_toBottomOf="@+id/editNum" />
 
         <CheckBox
             android:id="@+id/sickCheck2"
@@ -204,6 +125,17 @@
             android:text="없음"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/sickCheck3" />
+
+        <ImageView
+            android:id="@+id/imageView11"
+            android:layout_width="wrap_content"
+            android:layout_height="252dp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/sickCheck4"
+            app:srcCompat="@drawable/packet" />
 
     </android.support.constraint.ConstraintLayout>
 </ScrollView>

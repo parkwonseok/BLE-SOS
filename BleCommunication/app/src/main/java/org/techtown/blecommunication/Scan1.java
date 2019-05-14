@@ -45,6 +45,10 @@ public class Scan1 extends AppCompatActivity {
     ListView listView;
     SimpleAdapter simpleAdapter;
 
+    String TAG = "test Value";
+    int check = 0;
+    String isSOS;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -94,31 +98,41 @@ public class Scan1 extends AppCompatActivity {
         @Override
         public void onScanResult(int callbackType, final ScanResult result) {
             // 패킷에 담긴 조난자 정보
-            String str = new String(result.getScanRecord().getBytes(), Charset.forName("UTF-8"));
-            String serviceData = str.substring(25);
             int rssi = result.getRssi();
             double distance = getDistance(-56, rssi);
-            //device = result.getDevice();   // 조난신호를 보낸 장치
+            int listDeviceSize = listDevice.size();
+            String advData = result.getScanRecord().getDeviceName();
+
+            if(advData != null){
+                isSOS = advData.substring(0, 2);
+            }
+            else{
+                isSOS = "no";
+            }
 
             inputData = new HashMap<String, String>();
-            inputData.put("data", "패킷데이터 : " + serviceData);
-            inputData.put("distance", "거리 : " + Double.toString(distance).substring(0, 4));
+            inputData.put("data", "패킷데이터 : " + advData);
+            inputData.put("distance", isSOS + "rssi : " + String.valueOf(rssi));
 
-            if(listDevice.size() == 0){
-                bleDevices.add(result.getDevice());
-                listDevice.add(inputData);
-            }
-            for(int i= 0 ; i<listDevice.size(); i++){
+            for(int i= 0 ; i < listDeviceSize; i++){
 
-                if(listDevice.get(i).get("data").equals(inputData.get("data"))){
+                 if(listDevice.get(i).get("data").equals(inputData.get("data"))){
+
                     listDevice.set(i, inputData);
+                    check = 1;
                     break;
+                }
+            }
+            if(check == 0){
+                if(inputData.get("data").equals("null")){
+
                 }
                 else{
                     bleDevices.add(result.getDevice());
                     listDevice.add(inputData);
                 }
             }
+            check = 0;
             // 리스트뷰 갱신
             simpleAdapter.notifyDataSetChanged();
         }
@@ -137,7 +151,8 @@ public class Scan1 extends AppCompatActivity {
                 scanFilter.setServiceUuid(ParcelUuid.fromString("CDB7950D-73F1-4D4D-8E47-C090502DBD63"));
                 ScanFilter scan = scanFilter.build();
                 scanFilters.add(scan);
-                bleScanner.startScan(scanFilters, scanSettings, bleScanCallback);
+                //bleScanner.startScan(scanFilters, scanSettings, bleScanCallback);
+                bleScanner.startScan(bleScanCallback);
             }
         });
     }

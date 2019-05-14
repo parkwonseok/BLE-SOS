@@ -22,7 +22,7 @@
         android:layout_height="39dp"
         android:layout_marginStart="10dp"
         android:layout_marginTop="15dp"
-        android:text="조난자 목록"
+        android:text="탐색 목록"
         android:textColor="@android:color/background_dark"
         android:textSize="24sp"
         android:textStyle="bold"
