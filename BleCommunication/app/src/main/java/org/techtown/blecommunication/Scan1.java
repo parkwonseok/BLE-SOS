@@ -109,10 +109,16 @@ public class Scan1 extends AppCompatActivity {
             else{
                 isSOS = "no";
             }
-
-            inputData = new HashMap<String, String>();
-            inputData.put("data", "패킷데이터 : " + advData);
-            inputData.put("distance", isSOS + "rssi : " + String.valueOf(rssi));
+            if(isSOS.equals("ID")){
+                inputData = new HashMap<String, String>();
+                inputData.put("data", "패킷데이터 : " + advData);
+                inputData.put("distance", "<조난신호>     " + "rssi : " + String.valueOf(rssi));
+            }
+            else{
+                inputData = new HashMap<String, String>();
+                inputData.put("data", "패킷데이터 : " + advData);
+                inputData.put("distance", "<알 수 없는 신호>     " + "rssi : " + String.valueOf(rssi));
+            }
 
             for(int i= 0 ; i < listDeviceSize; i++){
 
