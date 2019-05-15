@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "819984168982",
+    "firebase_url": "https://smart-city-daebe.firebaseio.com",
+    "project_id": "smart-city-daebe",
+    "storage_bucket": "smart-city-daebe.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:819984168982:android:9e8e39990310bfcd",
+        "android_client_info": {
+          "package_name": "org.techtown.blecommunication"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "819984168982-jgnu8nof3bgcvsed4r396ecovebrcma3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDpk3IsIQPzuSg7O38hjNBgYBDh6ugaUiQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "819984168982-jgnu8nof3bgcvsed4r396ecovebrcma3.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
