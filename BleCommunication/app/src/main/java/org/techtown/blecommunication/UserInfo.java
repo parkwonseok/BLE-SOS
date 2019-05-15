@@ -24,8 +24,20 @@ public class UserInfo {
         this.birth = birth;
         this.contact = contact;
         this.disease = disease;
-        created_at = (new SimpleDateFormat("yyyyMMddHHmmss").format(date));
-        updated_at = (new SimpleDateFormat("yyyyMMddHHmmss").format(date));
+        this.created_at = (new SimpleDateFormat("yyyyMMddHHmmss").format(date));
+        this.updated_at = (new SimpleDateFormat("yyyyMMddHHmmss").format(date));
+    }
+
+    public UserInfo(String name, String gender, String birth, String contact,String disease){
+        Calendar calendar = Calendar.getInstance();
+        java.util.Date date = calendar.getTime();
+        this.name = name;
+        this.gender = gender;
+        this.birth = birth;
+        this.contact = contact;
+        this.disease = disease;
+        this.created_at = (new SimpleDateFormat("yyyyMMddHHmmss").format(date));
+        this.updated_at = (new SimpleDateFormat("yyyyMMddHHmmss").format(date));
     }
 
 
