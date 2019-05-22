@@ -7,6 +7,7 @@ public class UserInfo {
 
 
     int _id;
+    int fire_id;
     String name;
     String gender;
     String birth;
@@ -15,10 +16,11 @@ public class UserInfo {
     String created_at;
     String updated_at;
 
-    public UserInfo(int _id, String name, String gender, String birth, String contact,String disease){
+    public UserInfo(int _id, int fire_id, String name, String gender, String birth, String contact,String disease){
         Calendar calendar = Calendar.getInstance();
         java.util.Date date = calendar.getTime();
         this._id = _id;
+        this.fire_id = fire_id;
         this.name = name;
         this.gender = gender;
         this.birth = birth;
@@ -28,9 +30,10 @@ public class UserInfo {
         this.updated_at = (new SimpleDateFormat("yyyyMMddHHmmss").format(date));
     }
 
-    public UserInfo(String name, String gender, String birth, String contact,String disease){
+    public UserInfo(int fire_id, String name, String gender, String birth, String contact,String disease){
         Calendar calendar = Calendar.getInstance();
         java.util.Date date = calendar.getTime();
+        this.fire_id = fire_id;
         this.name = name;
         this.gender = gender;
         this.birth = birth;
@@ -68,6 +71,7 @@ public class UserInfo {
     public String getBirth() {
         return birth;
     }
+
     public String getContact() {
         return contact;
     }
@@ -86,5 +90,13 @@ public class UserInfo {
 
     public void setDisease(String disease) {
         this.disease = disease;
+    }
+
+    public int getFire_id() {
+        return fire_id;
+    }
+
+    public void setFire_id(int fire_id) {
+        this.fire_id = fire_id;
     }
 }

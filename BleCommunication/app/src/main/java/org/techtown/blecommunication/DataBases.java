@@ -10,10 +10,12 @@ public class DataBases {
         public static final String BIRTH = "birth";
         public static final String CONTACT = "contact";
         public static final String DISEASE = "disease";
+        public static final String FIRE_ID = "fire_id";
         public static final String _TABLENAME = "address";
         public static final String _CREATE =
                 "create table " + _TABLENAME + "("
                         + _ID + " integer primary key autoincrement, "
+                        + FIRE_ID + " text not null, "
                         + NAME + " text not null , "
                         + GENDER + " text not null , "
                         + BIRTH + " text not null , "

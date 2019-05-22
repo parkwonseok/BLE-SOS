@@ -63,6 +63,7 @@ public class DbOpenHelper {
 
     /**
      *  데이터베이스에 사용자가 입력한 값을 insert하는 메소드
+     * @param fire_id       파이어베이스key값
      * @param name          이름
      * @param contact       전화번호
      * @param gender
@@ -70,8 +71,9 @@ public class DbOpenHelper {
      * @param disease
      * @return              SQLiteDataBase에 입력한 값을 insert
      */
-    public long insertColumn(String name, String gender, String birth, String contact, String disease) {
+    public long insertColumn(String fire_id, String name, String gender, String birth, String contact, String disease) {
         ContentValues values = new ContentValues();
+        values.put(DataBases.CreateDB.FIRE_ID, fire_id);
         values.put(DataBases.CreateDB.NAME, name);
         values.put(DataBases.CreateDB.GENDER, gender);
         values.put(DataBases.CreateDB.BIRTH, birth);
@@ -90,8 +92,9 @@ public class DbOpenHelper {
      * @param gender
      * @return              SQLiteDataBase에 입력한 값을 update
      */
-    public boolean updateColumn(long id, String name, String gender, String birth, String contact, String disease) {
+    public boolean updateColumn(String id, String name, String gender, String birth, String contact, String disease) {
         ContentValues values = new ContentValues();
+        values.put(DataBases.CreateDB._ID, id);
         values.put(DataBases.CreateDB.NAME, name);
         values.put(DataBases.CreateDB.GENDER, gender);
         values.put(DataBases.CreateDB.BIRTH, birth);
@@ -101,18 +104,18 @@ public class DbOpenHelper {
     }
 
     //입력한 id값을 가진 DB를 지우는 메소드
-    public boolean deleteColumn(long id) {
+    public boolean deleteColumn(String id) {
         return mDB.delete(DataBases.CreateDB._TABLENAME, "_id=" + id, null) > 0;
     }
 
-    //입력한 전화번호 값을 가진 DB를 지우는 메소드
-    public boolean deleteColumn(String number) {
-        return mDB.delete(DataBases.CreateDB._TABLENAME, "contact="+number, null) > 0;
-    }
+//    //입력한 전화번호 값을 가진 DB를 지우는 메소드
+//    public boolean deleteColumn(String number) {
+//        return mDB.delete(DataBases.CreateDB._TABLENAME, "contact="+number, null) > 0;
+//    }
 
     //커서 전체를 선택하는 메소드
     public Cursor getAllColumns() {
-        return mDB.query(DataBases.CreateDB._TABLENAME, null, null, null, null, null, null);
+        return mDB.query(DataBases.CreateDB._TABLENAME, null, null, null, null, null, null, null);
     }
 
     //ID 컬럼 얻어오기

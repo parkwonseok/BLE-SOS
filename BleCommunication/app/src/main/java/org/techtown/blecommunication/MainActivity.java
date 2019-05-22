@@ -24,7 +24,6 @@ public class MainActivity extends AppCompatActivity {
     public static final int REQUEST_ADVERTISE1_ACTIVITY = 101;   // Advertise1 액티비티 요청 상수
     public static final int REQUEST_SCAN1_ACTIVITY = 201;   // Scan1 액티비티 요청 상수
 
-
     private DbOpenHelper mDbOpenHelper; //내부 DB 관리
     private Cursor mCursor; // DB 관련
     private UserInfo mUserInfo;
@@ -72,16 +71,28 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // 목격자 버튼 클릭시
+        Button witnessBtn = (Button) findViewById(R.id.witnessBtn);
+        witnessBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), WitnessActivity.class);
+                startActivity(intent);
+            }
+        });
+
         //유저정보 표시
-        TextView userInfoTv = findViewById(R.id.UserInfoTV);
-        userInfoTv.setText(getUserInfo()+"님 반갑습니다.");
+//        TextView userInfoTv = findViewById(R.id.UserInfoTV);
+//        userInfoTv.setText(getUserInfo()+"님 반갑습니다.");
 
         //내 정보 바꾸기
         Button editUserInfoBtn = findViewById(R.id.bt_revise_myInfo);
         editUserInfoBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                getUserInfo();
                 Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                intent.putExtra("fire_id", mUserInfo.getFire_id());
                 intent.putExtra("name", mUserInfo.getName()); /*송신*/
                 intent.putExtra("gender",mUserInfo.getGender());
                 intent.putExtra("birth", mUserInfo.getBirth());
@@ -120,6 +131,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    //사용자 정보 확인
     public String getUserInfo(){
         mCursor = null;
         //DB에 있는 모든 컬럼을 가져옴
@@ -130,6 +142,7 @@ public class MainActivity extends AppCompatActivity {
         while(mCursor.moveToNext()){
             mUserInfo = new UserInfo(
                     mCursor.getInt(mCursor.getColumnIndex("_id")),
+                    mCursor.getInt(mCursor.getColumnIndex("fire_id")),
                     mCursor.getString(mCursor.getColumnIndex("name")),
                     mCursor.getString(mCursor.getColumnIndex("gender")),
                     mCursor.getString(mCursor.getColumnIndex("birth")),

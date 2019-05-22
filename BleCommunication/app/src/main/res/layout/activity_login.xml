@@ -160,5 +160,15 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:text="저장하기" />
-
+    <Button
+        android:id="@+id/btfire"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:text="파이어베이스 연동" />
+    <TextView
+        android:id="@+id/server_Tv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="서버 연결"/>
 </android.support.v7.widget.LinearLayoutCompat>
