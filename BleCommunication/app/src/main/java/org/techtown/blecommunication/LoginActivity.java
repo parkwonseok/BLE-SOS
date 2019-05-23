@@ -70,6 +70,15 @@ public class LoginActivity extends AppCompatActivity {
         Button btfire = findViewById(R.id.btfire);
         final TextView serverTv = findViewById(R.id.server_Tv);
 
+        Button btmap = findViewById(R.id.map_bnt);
+
+        btmap.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), Find_locationActivity.class);
+                startActivity(intent);
+            }
+        });
         //firebase 연결
         mFirebaseInstance = FirebaseDatabase.getInstance();
 

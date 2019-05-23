@@ -171,4 +171,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="서버 연결"/>
+
+    <Button
+        android:id="@+id/map_bnt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="지도로"/>
 </android.support.v7.widget.LinearLayoutCompat>
