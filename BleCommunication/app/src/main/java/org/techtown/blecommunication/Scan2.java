@@ -10,9 +10,7 @@ import android.widget.TextView;
 public class Scan2 extends AppCompatActivity {
     TextView textView;
     String scanData;
-    String num;
-    String time;
-    String sick;
+    String batLen;
     String battery;
 
     public static final int REQUEST_CODE_SCAN3 = 203;   // Scan3 액티비티 요청 상수
@@ -29,75 +27,50 @@ public class Scan2 extends AppCompatActivity {
         Intent intent = getIntent();
         getIntentData(intent);
 
-        String data = scanData.substring(34);
-        String dataLenCheck = scanData.substring(39, 40);
-        if(!isNumeric(dataLenCheck)){
-            num = scanData.substring(34, 35);   // 조난인원
-            time = scanData.substring(35, 36);   // 조난시간
-            sick = scanData.substring(36, 37);   // 현재상태
-            battery = scanData.substring(37, 39);   // 배터리 잔량
+        String data = scanData.substring(48);
+        String id = data.substring(0, 4);
+        String num = data.substring(4, 5);
+        String time = data.substring(5, 16);
+        String sick = data.substring(16, 17);
+        batLen = data.substring(17);
+        if(batLen.length() == 2){
+            battery = batLen.substring(0, 1);
+        }
+        else if(batLen.length() == 3){
+            battery = batLen.substring(0, 2);
         }
         else{
-            num = scanData.substring(34, 36);   // 조난인원
-            time = scanData.substring(36, 37);   // 조난시간
-            sick = scanData.substring(37, 38);   // 현재상태
-            battery = scanData.substring(38, 40);   // 배터리 잔량
+            battery = "100";
         }
-        textView.append("조난인원 : " + num);
-        if(time.equals("0")){
-            textView.append("\n조난시간 : 1시간");
-        }
-        else if(time.equals("1")){
-            textView.append("\n조난시간 : 2시간");
-        }
-        else if(time.equals("2")){
-            textView.append("\n조난시간 : 4시간");
-        }
-        else if(time.equals("3")){
-            textView.append("\n조난시간 : 8시간");
-        }
-        else if(time.equals("4")){
-            textView.append("\n조난시간 : 12시간");
-        }
-        else if(time.equals("5")){
-            textView.append("\n조난시간 : 24시간");
-        }
-        else if(time.equals("6")){
-            textView.append("\n조난시간 : 48시간");
-        }
-        else if(time.equals("7")){
-            textView.append("\n조난시간 : 48시간 이상");
-        }
+        textView.append("   -  회원 ID : " + id);
+        textView.append("\n   -  조난인원 : " + num);
+        textView.append("\n   -  조난일시 : " + time);
         if(sick.equals("0")){
-            textView.append("\n현재상태 : 이상 없음");
+            textView.append("\n   -  현재상태 : 이상 없음");
         }
         else if(sick.equals("1")){
-            textView.append("\n현재상태 : 골절");
+            textView.append("\n   -  현재상태 : 골절");
         }
         else if(sick.equals("2")){
-            textView.append("\n현재상태 : 출혈");
+            textView.append("\n   -  현재상태 : 출혈");
         }
         else if(sick.equals("3")){
-            textView.append("\n현재상태 : 골절, 출혈");
+            textView.append("\n   -  현재상태 : 골절, 출혈");
         }
         else if(sick.equals("4")){
-            textView.append("\n현재상태 : 염좌(삠)");
+            textView.append("\n   -  현재상태 : 염좌(삠)");
         }
         else if(sick.equals("5")){
-            textView.append("\n현재상태 : 골절, 염좌(삠)");
+            textView.append("\n   -  현재상태 : 골절, 염좌(삠)");
         }
         else if(sick.equals("6")){
-            textView.append("\n현재상태 : 출혈, 염좌(삠)");
+            textView.append("\n   -  현재상태 : 출혈, 염좌(삠)");
         }
         else if(sick.equals("7")){
-            textView.append("\n현재상태 : 골절, 출혈, 염좌(삠)");
+            textView.append("\n   -  현재상태 : 골절, 출혈, 염좌(삠)");
         }
-        if(battery.equals("00")){
-            textView.append("\n배터리 : 100%");
-        }
-        else{
-            textView.append("\n배터리 : " + battery + "%");
-        }
+        textView.append("\n   -  배터리 : " + battery + " %");
+
 
         // 재탐색 버튼 클릭시
         Button scanBtn = (Button) findViewById(R.id.scanBtn);

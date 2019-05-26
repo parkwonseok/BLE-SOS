@@ -10,29 +10,26 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.RadioButton;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class Advertise1 extends AppCompatActivity {
     // 조난자 정보 입력 ui
     EditText editNum;
-    RadioButton timeRadio1;
-    RadioButton timeRadio2;
-    RadioButton timeRadio3;
-    RadioButton timeRadio4;
-    RadioButton timeRadio5;
-    RadioButton timeRadio6;
-    RadioButton timeRadio7;
-    RadioButton timeRadio8;
     CheckBox sickRadio1;
     CheckBox sickRadio2;
     CheckBox sickRadio3;
     CheckBox sickRadio4;
 
-    // 입력 받은 조난자 정보 저장할 문자열 변수
+    // 현재시간
+    long mNow;
+    Date mDate;
+    SimpleDateFormat mFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+
+    // 패킷에 들어가는 정보
     String num;
     String time;
     String sick;
-    int batteryPct;
     String battery;
 
     public static final int REQUEST_ADVERTISE2_ACTIVITY = 102;   // Advertise2 액티비티 요청 상수
@@ -43,14 +40,6 @@ public class Advertise1 extends AppCompatActivity {
         setContentView(R.layout.activity_advertise1);
 
         editNum = findViewById(R.id.editNum);
-        timeRadio1 = findViewById(R.id.timeRadio1);
-        timeRadio2 = findViewById(R.id.timeRadio2);
-        timeRadio3 = findViewById(R.id.timeRadio3);
-        timeRadio4 = findViewById(R.id.timeRadio4);
-        timeRadio5 = findViewById(R.id.timeRadio5);
-        timeRadio6 = findViewById(R.id.timeRadio6);
-        timeRadio7 = findViewById(R.id.timeRadio7);
-        timeRadio8 = findViewById(R.id.timeRadio8);
         sickRadio1 = findViewById(R.id.sickCheck1);
         sickRadio2 = findViewById(R.id.sickCheck2);
         sickRadio3 = findViewById(R.id.sickCheck3);
@@ -97,34 +86,8 @@ public class Advertise1 extends AppCompatActivity {
                 if(num.equals("")){
                     num = "0";
                 }
-                // 조난시간
-                if(timeRadio1.isChecked()){
-                    time = "0";
-                }
-                else if(timeRadio2.isChecked()){
-                    time = "1";
-                }
-                else if(timeRadio3.isChecked()){
-                    time = "2";
-                }
-                else if(timeRadio4.isChecked()){
-                    time = "3";
-                }
-                else if(timeRadio5.isChecked()){
-                    time = "4";
-                }
-                else if(timeRadio6.isChecked()){
-                    time = "5";
-                }
-                else if(timeRadio7.isChecked()){
-                    time = "6";
-                }
-                else if(timeRadio8.isChecked()){
-                    time = "7";
-                }
-                else{
-                    time = "0";
-                }
+                // 조난일시
+                time = getTime().substring(5, 16);
                 // 현재상태
                 int sickNum = 0;
                 if(sickRadio1.isChecked()){
@@ -141,13 +104,7 @@ public class Advertise1 extends AppCompatActivity {
                 }
                 sick = String.valueOf(sickNum);
                 // 배터리 잔량
-                batteryPct = getBatteryRemain(getApplicationContext());
-                if(batteryPct == 100){
-                    battery = "00";
-                }
-                else{
-                    battery = String.valueOf(batteryPct);
-                }
+                battery = String.valueOf(getBatteryRemain(getApplicationContext()));
 
                 Intent intent = new Intent(getApplicationContext(), Advertise2.class);
                 AdvertiseInfo advertiseInfo = new AdvertiseInfo(num, time, sick, battery);
@@ -166,5 +123,11 @@ public class Advertise1 extends AppCompatActivity {
         float batteryPct = level / (float)scale;
 
         return (int)(batteryPct * 100);
+    }
+    // 현재시간 함수
+    public String getTime(){
+        mNow = System.currentTimeMillis();
+        mDate = new Date(mNow);
+        return mFormat.format(mDate);
     }
 }

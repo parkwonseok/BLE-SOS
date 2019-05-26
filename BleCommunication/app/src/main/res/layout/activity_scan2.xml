@@ -18,13 +18,13 @@
 
     <TextView
         android:id="@+id/textView2"
-        android:layout_width="187dp"
-        android:layout_height="50dp"
+        android:layout_width="245dp"
+        android:layout_height="62dp"
         android:layout_marginTop="30dp"
         android:gravity="center"
         android:text="조난자 정보"
         android:textColor="@android:color/background_dark"
-        android:textSize="30sp"
+        android:textSize="45sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -32,10 +32,12 @@
 
     <TextView
         android:id="@+id/textView"
-        android:layout_width="253dp"
+        android:layout_width="362dp"
         android:layout_height="291dp"
-        android:layout_marginTop="20dp"
-        android:textSize="18sp"
+        android:layout_marginTop="32dp"
+        android:textColor="@android:color/background_dark"
+        android:textSize="24sp"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView2" />
