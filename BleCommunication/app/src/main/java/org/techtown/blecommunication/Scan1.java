@@ -20,6 +20,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
+import android.widget.TextView;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -45,7 +46,12 @@ public class Scan1 extends AppCompatActivity {
     ListView listView;
     SimpleAdapter simpleAdapter;
 
-    String TAG = "test Value";
+    // Map < 조난자id, rssi값 20개 >
+    HashMap<String, Object> sosRssi = new HashMap<>();
+    // Map < 조난자id, 거리 >
+    HashMap<String, Double> sosDistance = new HashMap<>();
+    TextView testView;
+
     int check = 0;
     String isSOS;
 
@@ -91,6 +97,8 @@ public class Scan1 extends AppCompatActivity {
                 startActivityForResult(intent, REQUEST_SCAN2_ACTIVITY);
             }
         });
+        testView = findViewById(R.id.testView);
+
     }
 
     // Scan 결과 반환 함수
@@ -99,7 +107,6 @@ public class Scan1 extends AppCompatActivity {
         public void onScanResult(int callbackType, final ScanResult result) {
             // 패킷에 담긴 조난자 정보
             int rssi = result.getRssi();
-            double distance = getDistance(-56, rssi);
             int listDeviceSize = listDevice.size();
             String advData = result.getScanRecord().getDeviceName();
 
@@ -113,6 +120,25 @@ public class Scan1 extends AppCompatActivity {
                 inputData = new HashMap<String, String>();
                 inputData.put("data", "패킷데이터 : " + advData);
                 inputData.put("distance", "<조난신호>     " + "rssi : " + String.valueOf(rssi));
+
+                // 삼각측량 부분
+                String key = advData.substring(2, 6);
+                ArrayList<Double> rssiList;
+
+                if(sosRssi.containsKey(key))
+                    rssiList = (ArrayList<Double>) sosRssi.get(key);
+                else
+                    rssiList = new ArrayList<>();
+                if(rssiList.size() < 20) {
+                    rssiList.add((double)rssi);
+                    sosRssi.put(key, rssiList);
+                }
+                else if(rssiList.size() == 20){
+                    sosDistance.put(key, getDistance(1.55,-56, kalman(rssiList, 50.0, 0.008)));
+                }
+
+                testView.setText("RSSI 개수 : " + String.valueOf(rssiList.size()));
+
             }
             else{
                 inputData = new HashMap<String, String>();
@@ -179,9 +205,64 @@ public class Scan1 extends AppCompatActivity {
     }
 
     // rssi -> 거리
-    protected static double getDistance(int txPower, double rssi){
-        double d = Math.pow(10, (txPower-rssi)/(Math.pow(10, 1.6)));
+    protected static double getDistance(double n, int txPower, double rssi){
+        double d = Math.pow(10, (txPower-rssi)/(Math.pow(10, n)));
 
         return d;
+    }
+
+    /* Complete calculation of Kalman Filter */
+    public static double kalman (ArrayList<Double> inputValues, double initialVariance, double noise){
+        return calculate(inputValues, initialVariance, noise);
+    }
+
+    /* Calculation of Kalman Filter using default values for wireless Access Points data acquisition */
+    public static double kalman (ArrayList<Double> inputValues){
+        return calculate(inputValues, 50.0, 0.008);
+    }
+
+    /* Calculation of arithmetic mean */
+    public static double mean (ArrayList<Double> inputValues){
+        return utilsMean(inputValues);
+    }
+
+
+    /*This method is the responsible for calculating the value refined with Kalman Filter */
+    private static double calculate(ArrayList<Double> inputValues, double initialVariance, double noise){
+        double kalmanGain;
+        double variance = initialVariance;
+        double processNoise = noise;
+        double measurementNoise = utilsVariance(inputValues);
+        double mean = inputValues.get(0);
+
+        for (double value : inputValues){
+            variance = variance + processNoise;
+            kalmanGain = variance/((variance+measurementNoise));
+            mean = mean + kalmanGain*(value - mean);
+            variance = variance - (kalmanGain*variance);
+        }
+
+        return mean;
+    }
+
+    public static double utilsVariance(ArrayList<Double> values){
+        double sum1 = 0.0;
+        double mean = utilsMean(values);
+        for(double num : values){
+            sum1 += Math.pow(num - mean , 2);
+        }
+        return sum1/(values.size()-1);
+    }
+
+    public static double utilsMean(ArrayList<Double> values){
+        return utilsSum(values)/values.size();
+    }
+
+    private static double utilsSum (ArrayList<Double> values){
+        double sum1 = 0.0;
+        for (double num : values){
+            sum1+=num;
+        }
+        return sum1;
     }
 }
