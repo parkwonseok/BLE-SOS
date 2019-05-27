@@ -29,7 +29,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
-public class LoginActivity extends AppCompatActivity {
+public class  LoginActivity extends AppCompatActivity {
     private static final String TAG = "TestDataBase";
     private DbOpenHelper mDbOpenHelper;
     public String gender;

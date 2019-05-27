@@ -159,7 +159,6 @@
         android:layout_width="match_parent"
         android:layout_height="70dp"
         android:layout_marginBottom="8dp"
-<<<<<<< HEAD
         android:text="저장하기" />
     <Button
         android:id="@+id/btfire"
@@ -172,12 +171,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="서버 연결"/>
-=======
-        android:background="@drawable/btn"
-        android:text="저장하기"
-        android:textColor="@android:color/background_light"
-        android:textSize="24sp"
-        android:textStyle="bold" />
 
->>>>>>> listview
+
 </android.support.v7.widget.LinearLayoutCompat>
