@@ -172,5 +172,4 @@
         android:layout_height="wrap_content"
         android:text="서버 연결"/>
 
-
 </android.support.v7.widget.LinearLayoutCompat>
