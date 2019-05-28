@@ -24,7 +24,6 @@ public class MainActivity extends AppCompatActivity {
     private DbOpenHelper mDbOpenHelper; //내부 DB 관리
     private Cursor mCursor; // DB 관련
     private UserInfo mUserInfo;
-    private ArrayList<UserInfo> mInfoArr;
     private static final String TAG = "TestDataBase";
 
     BluetoothManager bleManager;   // 블루투스 관리
@@ -39,8 +38,6 @@ public class MainActivity extends AppCompatActivity {
         //내장 DB 실행
         mDbOpenHelper = new DbOpenHelper(this);
         mDbOpenHelper.open();
-        mInfoArr = new ArrayList<UserInfo>();
-
 
         bleActivation();   // 블루투스 활성화 하기
 
@@ -136,19 +133,18 @@ public class MainActivity extends AppCompatActivity {
 
         String Tvcontent;
         //컬럼의 갯수 확인
-        while(mCursor.moveToNext()){
-            mUserInfo = new UserInfo(
-                    mCursor.getInt(mCursor.getColumnIndex("_id")),
-                    mCursor.getInt(mCursor.getColumnIndex("fire_id")),
-                    mCursor.getString(mCursor.getColumnIndex("name")),
-                    mCursor.getString(mCursor.getColumnIndex("gender")),
-                    mCursor.getString(mCursor.getColumnIndex("birth")),
-                    mCursor.getString(mCursor.getColumnIndex("contact")),
-                    mCursor.getString(mCursor.getColumnIndex("disease"))
-            );
-            mInfoArr.add(mUserInfo);
-            Log.i(TAG, "ID = " + mUserInfo._id);
-        }
+        mCursor = mDbOpenHelper.getAllColumns();
+        mCursor.moveToLast();
+        mUserInfo = new UserInfo(
+                mCursor.getInt(mCursor.getColumnIndex("_id")),
+                mCursor.getInt(mCursor.getColumnIndex("fire_id")),
+                mCursor.getString(mCursor.getColumnIndex("name")),
+                mCursor.getString(mCursor.getColumnIndex("gender")),
+                mCursor.getString(mCursor.getColumnIndex("birth")),
+                mCursor.getString(mCursor.getColumnIndex("contact")),
+                mCursor.getString(mCursor.getColumnIndex("disease"))
+        );
+        Log.i(TAG, "ID = " + mUserInfo._id);
 
         //Cursor 닫기
         mCursor.close();

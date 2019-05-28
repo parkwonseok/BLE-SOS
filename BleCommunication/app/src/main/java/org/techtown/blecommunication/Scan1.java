@@ -10,17 +10,29 @@ import android.bluetooth.le.ScanResult;
 import android.bluetooth.le.ScanSettings;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.nfc.Tag;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.ParcelUuid;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
+
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -55,10 +67,61 @@ public class Scan1 extends AppCompatActivity {
     int check = 0;
     String isSOS;
 
+
+    ArrayList<String> SOS_id = new ArrayList<>();
+    ArrayList<Double> SOS_distance = new ArrayList<>();
+
+    double longitude;
+    double latitude;
+
+    Button senddt_bt;
+    Button show_bt;
+
+    //firebase 전송을 위한 세팅
+    private DbOpenHelper mDbOpenHelper; //내부 DB 관리
+    private Cursor mCursor; // DB 관련
+    private DatabaseReference mFirebaseDatabase;
+    private FirebaseDatabase mFirebaseInstance;
+    int fire_id;
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        final LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        //firebase 연결
+        mFirebaseInstance = FirebaseDatabase.getInstance();
+        //referencce 초기 설정("DataUsers/")
+        mFirebaseDatabase = mFirebaseInstance.getReference("DataUsers");
+        if ( Build.VERSION.SDK_INT >= 23 &&
+                ContextCompat.checkSelfPermission( getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION ) != PackageManager.PERMISSION_GRANTED ) {
+            ActivityCompat.requestPermissions( Scan1.this, new String[] {  android.Manifest.permission.ACCESS_FINE_LOCATION  },
+                    0 );
+        }
+        else{
+            Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
+                    1000,
+                    1,
+                    gpsLocationListener);
+            String provider = location.getProvider();
+            longitude = location.getLongitude();
+            latitude = location.getLatitude();
+            Log.d("그치만,,,,", "위치정보 : " + provider + "\n" +
+                    "위도 : " + longitude + "\n" +
+                    "경도 : " + latitude + "\n");
+        }
+
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scan1);
+
+
+
+        senddt_bt = findViewById(R.id.sendDt);
+        show_bt = findViewById(R.id.show);
 
         bleManager = (BluetoothManager)getSystemService(Context.BLUETOOTH_SERVICE);
         bleAdapter = bleManager.getAdapter();
@@ -98,6 +161,47 @@ public class Scan1 extends AppCompatActivity {
             }
         });
         testView = findViewById(R.id.testView);
+
+        //조난자 전송버튼
+        senddt_bt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+                if ( Build.VERSION.SDK_INT >= 23 &&
+                        ContextCompat.checkSelfPermission( getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION ) != PackageManager.PERMISSION_GRANTED ) {
+                    ActivityCompat.requestPermissions( Scan1.this, new String[] {  android.Manifest.permission.ACCESS_FINE_LOCATION  },
+                            0 );
+                }
+                else{
+                    Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                    lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
+                            1000,
+                            1,
+                            gpsLocationListener);
+                    String provider = location.getProvider();
+                    longitude = location.getLongitude();
+                    latitude = location.getLatitude();
+                    Log.d("그치만,,,,", "위치정보 : " + provider + "\n" +
+                            "위도 : " + longitude + "\n" +
+                            "경도 : " + latitude + "\n");
+                }
+
+                for(String key:sosDistance.keySet()){
+                    addSOSList(Integer.parseInt(key), sosDistance.get(key), latitude, longitude);
+                }
+
+            }
+        });
+
+        //조난자 위치버튼
+        show_bt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent1 = new Intent(getApplicationContext(), googlemapActivity.class);
+                startActivity(intent1);
+
+            }
+        });
 
     }
 
@@ -265,4 +369,39 @@ public class Scan1 extends AppCompatActivity {
         }
         return sum1;
     }
+
+    public void addSOSList(int SOS_id, double distance, double latitude, double longitude){
+        mDbOpenHelper = new DbOpenHelper(this);
+        mDbOpenHelper.open();
+        mCursor = null;
+        //DB에 있는 모든 컬럼을 가져옴
+        mCursor = mDbOpenHelper.getAllColumns();
+        mCursor.moveToLast();
+        fire_id = mCursor.getInt(mCursor.getColumnIndex("fire_id"));
+        Log.d("data_value",fire_id + "/" + distance + "/" + latitude + "/" + longitude);
+
+        mFirebaseDatabase.child("sos_info").child(String.valueOf(SOS_id)).child(String.valueOf(fire_id)).child("distance").setValue(distance);
+
+        mFirebaseDatabase.child("sos_info").child(String.valueOf(SOS_id)).child(String.valueOf(fire_id)).child("latitude").setValue(latitude);
+
+        mFirebaseDatabase.child("sos_info").child(String.valueOf(SOS_id)).child(String.valueOf(fire_id)).child("longitude").setValue(longitude);
+    }
+
+    final LocationListener gpsLocationListener = new LocationListener() {
+        public void onLocationChanged(Location location) {
+
+            String provider = location.getProvider();
+            longitude = location.getLongitude();
+            latitude = location.getLatitude();
+        }
+
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+        }
+
+        public void onProviderEnabled(String provider) {
+        }
+
+        public void onProviderDisabled(String provider) {
+        }
+    };
 }

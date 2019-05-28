@@ -71,15 +71,29 @@ public class googlemapActivity extends AppCompatActivity {
         SOSInfo find_location;
         double bAlat = A.getLatitude();
         double bAlong = A.getLongitude();
-        double distanceA = A.getDistance();
         double bBlat = B.getLatitude();
         double bBlong = B.getLongitude();
-        double distanceB = B.getDistance();
         double bClat = C.getLatitude();
         double bClong = C.getLongitude();
-        double distanceC = C.getDistance();
+        double distanceA = Math.round(A.getDistance()*100)/100.0;
+        double distanceB = Math.round(B.getDistance()*100)/100.0;
+        double distanceC = Math.round(C.getDistance()*100)/100.0;
 
+        //절대 좌표
+        double Xlat = 0;
+        double Xlong = 0;
+        double Ylat = (Math.round((bAlat-bBlat)*1000000)*1.1*100000)/1000000.0;
+        double Ylong = (Math.round((bAlong-bBlong)*1000000)*0.9*100000)/1000000.0;
+        double Zlat = (Math.round((bAlat-bClat)*10000000)*1.1*100000)/1000000.0;
+        double Zlong = (Math.round((bAlong-bClong)*1000000)*0.9*100000)/1000000.0;
+        Log.d("절대 좌표값", Xlat+"/"+Xlong+"/"+Ylat+"/"+Ylong+"/"+Zlat+"/"+Zlong);
 
+        bAlat = 0;
+        bAlong = 0;
+        bBlat = Ylat;
+        bBlong = Ylong;
+        bClat = Zlat;
+        bClong = Zlong;
         double W, Z, foundBeaconLat, foundBeaconLong, foundBeaconLongFilter;
         W = distanceA * distanceA - distanceB * distanceB - bAlat * bAlat - bAlong * bAlong + bBlat * bBlat + bBlong * bBlong;
         Z = distanceB * distanceB - distanceC * distanceC - bBlat * bBlat - bBlong * bBlong + bClat * bClat + bClong * bClong;
@@ -163,14 +177,16 @@ public class googlemapActivity extends AppCompatActivity {
 
     public void find_sos(ArrayList<SOSInfo> sosInfos){
         counter = 0;
-        int check_id = 0;
+        int check_id = -1;
         for(SOSInfo sosinfo: sosInfos){
-            if(check_id == 0){
+            //처음 시작부분
+            if(check_id == -1){
                 check_id = sosinfo.sos_id;
                 Log.d("check_id", check_id+"");
                 finder[counter] = sosinfo;
                 counter++;
             }
+
             else if(check_id == sosinfo.sos_id){
                 finder[counter] = sosinfo;
                 Log.d("check_id", check_id+"");
@@ -178,13 +194,14 @@ public class googlemapActivity extends AppCompatActivity {
             }
             else{
                 Log.d("check_id", check_id+"");
-                counter = 0;
+                counter = 1;
                 check_id = sosinfo.sos_id;
+                finder[0] = sosinfo;
             }
             if(counter==3){
                 Log.d("finder[0~2]",finder[0].helper_id+"/"+finder[1].helper_id+"/"+finder[2].helper_id);
                 getLocationWithTrilateration(finder[0],finder[1],finder[2]);
-                check_id = 0;
+                check_id = -1;
                 counter =0;
             }
         }

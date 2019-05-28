@@ -54,21 +54,35 @@ public class WitnessActivity extends AppCompatActivity {
     double longitude;
     double latitude;
     int counter;
-    String counter_set;
 
     private DatabaseReference mFirebaseDatabase;
     private FirebaseDatabase mFirebaseInstance;
-    private int UserId;
-    private String fire_id;
+    private int fire_id;
 
     private DbOpenHelper mDbOpenHelper; //내부 DB 관리
     private Cursor mCursor; // DB 관련
     private UserInfo mUserInfo;
-    private ArrayList<UserInfo> mInfoArr;
     String TAG = "database";
 
-
-
+    final LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mFirebaseInstance = FirebaseDatabase.getInstance();
+        mFirebaseDatabase = mFirebaseInstance.getReference("DataUsers");
+        DatabaseReference counterRef = mFirebaseDatabase.child("Witness").child("counter");
+        counterRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                //sos_id
+                counter= Integer.parseInt(String.valueOf(dataSnapshot.getValue(Integer.class)));
+                Log.d("counter", String.valueOf(counter));
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
+        });
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -93,11 +107,26 @@ public class WitnessActivity extends AppCompatActivity {
 
         mDbOpenHelper = new DbOpenHelper(this);
         mDbOpenHelper.open();
-        mInfoArr = new ArrayList<UserInfo>();
         getUserInfo();
 
-        //counter
-
+        if ( Build.VERSION.SDK_INT >= 23 &&
+                ContextCompat.checkSelfPermission( getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION ) != PackageManager.PERMISSION_GRANTED ) {
+            ActivityCompat.requestPermissions( WitnessActivity.this, new String[] {  android.Manifest.permission.ACCESS_FINE_LOCATION  },
+                    0 );
+        }
+        else{
+            Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
+                    1000,
+                    1,
+                    gpsLocationListener);
+            String provider = location.getProvider();
+            longitude = location.getLongitude();
+            latitude = location.getLatitude();
+            Log.d(TAG, "위치정보 : " + provider + "\n" +
+                    "위도 : " + longitude + "\n" +
+                    "경도 : " + latitude + "\n");
+        }
 
 
         submitBtn.setOnClickListener(new View.OnClickListener() {
@@ -140,121 +169,36 @@ public class WitnessActivity extends AppCompatActivity {
             }
         });
 
-        final LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-
-
-        locationBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                DatabaseReference counterRef = mFirebaseDatabase.child("Witness").child("counter");
-                counterRef.runTransaction(new Transaction.Handler() {
-                    @Override
-                    public Transaction.Result doTransaction(MutableData mutableData) {
-                        Integer currentValue = mutableData.getValue(Integer.class);
-                        if (currentValue == null) {
-                            mutableData.setValue(1);
-                        } else {
-                            mutableData.setValue(currentValue + 1);
-                            counter = currentValue;
-                        }
-
-                        return Transaction.success(mutableData);
-                    }
-
-                    @Override
-                    public void onComplete(
-                            DatabaseError databaseError, boolean committed, DataSnapshot dataSnapshot) {
-                        System.out.println("Transaction completed");
-                    }
-                });
-
-                if ( Build.VERSION.SDK_INT >= 23 &&
-                        ContextCompat.checkSelfPermission( getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION ) != PackageManager.PERMISSION_GRANTED ) {
-                    ActivityCompat.requestPermissions( WitnessActivity.this, new String[] {  android.Manifest.permission.ACCESS_FINE_LOCATION  },
-                            0 );
-                }
-                else{
-                    Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                    lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
-                            1000,
-                            1,
-                            gpsLocationListener);
-                    String provider = location.getProvider();
-                    longitude = location.getLongitude();
-                    latitude = location.getLatitude();
-
-
-
-//                    lm.requestLocationUpdates(LocationManager.GPS_PROVIDER,
-//                            1000,
-//                            1,
-//                            gpsLocationListener);
-
-                }
-
-            }
-        });
-
     }
 
-    public String getUserInfo(){
+    public void getUserInfo() {
         mCursor = null;
         //DB에 있는 모든 컬럼을 가져옴
         mCursor = mDbOpenHelper.getAllColumns();
-
-        String User_name;
-        //컬럼의 갯수 확인
-        while(mCursor.moveToNext()){
-            mUserInfo = new UserInfo(
-                    mCursor.getInt(mCursor.getColumnIndex("_id")),
-                    mCursor.getInt(mCursor.getColumnIndex("fire_id")),
-                    mCursor.getString(mCursor.getColumnIndex("name")),
-                    mCursor.getString(mCursor.getColumnIndex("gender")),
-                    mCursor.getString(mCursor.getColumnIndex("birth")),
-                    mCursor.getString(mCursor.getColumnIndex("contact")),
-                    mCursor.getString(mCursor.getColumnIndex("disease"))
-            );
-            mInfoArr.add(mUserInfo);
-        }
-
-        //Cursor 닫기
+        mCursor.moveToLast();
+        mUserInfo = new UserInfo(
+                mCursor.getInt(mCursor.getColumnIndex("_id")),
+                mCursor.getInt(mCursor.getColumnIndex("fire_id")),
+                mCursor.getString(mCursor.getColumnIndex("name")),
+                mCursor.getString(mCursor.getColumnIndex("gender")),
+                mCursor.getString(mCursor.getColumnIndex("birth")),
+                mCursor.getString(mCursor.getColumnIndex("contact")),
+                mCursor.getString(mCursor.getColumnIndex("disease"))
+        );
         mCursor.close();
-        User_name = mUserInfo.getName();
-        UserId = mUserInfo.getFire_id();
-        Log.d(TAG, User_name +" ///"+ UserId);
-        return User_name;
+        fire_id = mUserInfo.getFire_id();
     }
 
-    public void addWitness(int counter, String time, String content, double longitude, double latitude){
-        WitnessInfo witnessInfo = new WitnessInfo(counter, time, content, longitude, latitude, counter);
-        counter_set = String.valueOf(counter);
+    public void addWitness(int fire_id, String time, String content, double longitude, double latitude){
+        WitnessInfo witnessInfo = new WitnessInfo(fire_id, time, content, longitude, latitude);
         Log.d(TAG, witnessInfo.getUser_id() + "/" +
                 witnessInfo.getContent()+ "/" +
                 witnessInfo.getLongitude()+ "/" +
                 witnessInfo.getLatitude()+ "/" +
-                witnessInfo.getCounter());
-        mFirebaseDatabase.child("Witness").child(counter_set).setValue(witnessInfo);
+                witnessInfo.getUser_id());
+        mFirebaseDatabase.child("Witness").child(String.valueOf(counter+1)).setValue(witnessInfo);
+        mFirebaseDatabase.child("Witness").child("counter").setValue(counter+1);
     }
-
-    public void readDate(View view){
-        mFirebaseDatabase.child("Witness").addValueEventListener(new ValueEventListener(){
-
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot){
-                for(DataSnapshot ds: dataSnapshot.getChildren()){
-                    counter =  ds.child("counter").getValue(Integer.class);
-                    Log.d("TAG", "" + counter);
-                }
-            }
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError){
-
-            }
-
-        });
-    }
-
 
     final LocationListener gpsLocationListener = new LocationListener() {
         public void onLocationChanged(Location location) {

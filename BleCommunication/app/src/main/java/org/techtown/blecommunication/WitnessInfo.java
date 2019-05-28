@@ -20,11 +20,7 @@ public class WitnessInfo {
     String longitude;
     String latitude;
 
-
-
-    int counter;
-
-    public WitnessInfo(int user_id, String time, String content, double longitude, double latitude, int counter){
+    public WitnessInfo(int user_id, String time, String content, double longitude, double latitude){
         Calendar calendar = Calendar.getInstance();
         java.util.Date date = calendar.getTime();
         this.user_id = user_id;
@@ -32,7 +28,6 @@ public class WitnessInfo {
         this.time = time;
         this.longitude = String.valueOf(longitude);
         this.latitude = String.valueOf(latitude);
-        this.counter = counter;
         created_at = (new SimpleDateFormat("yyyyMMddHHmmss").format(date));
         updated_at = (new SimpleDateFormat("yyyyMMddHHmmss").format(date));
 
@@ -92,12 +87,5 @@ public class WitnessInfo {
 
     public void setLatitude(String latitude) {
         this.latitude = latitude;
-    }
-    public int getCounter() {
-        return counter;
-    }
-
-    public void setCounter(int counter) {
-        this.counter = counter;
     }
 }
