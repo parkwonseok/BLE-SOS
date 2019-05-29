@@ -259,14 +259,8 @@ public class googlemapActivity extends AppCompatActivity implements OnMapReadyCa
     public void onMapReady(GoogleMap map) {
         LatLng Dongguk = new LatLng(37.558384, 127.000139);
         googleMap = map;
-        MarkerOptions markerOptions = new MarkerOptions();
-        markerOptions.position(Dongguk);
-        markerOptions.title("동국대학교");
-        markerOptions.snippet("스마트시티");
-        map.addMarker(markerOptions);
-
         map.moveCamera(CameraUpdateFactory.newLatLng(Dongguk));
-        map.animateCamera(CameraUpdateFactory.zoomTo(13));
+        map.animateCamera(CameraUpdateFactory.zoomTo(16));
     }
 
     public static void addHelper_marker(SOSInfo p){
