@@ -1,8 +1,9 @@
 package org.techtown.blecommunication;
 
+import android.app.FragmentManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -10,25 +11,29 @@ import android.view.View;
 import android.widget.Button;
 
 
-import com.google.firebase.database.ChildEventListener;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.CircleOptions;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-
-import java.sql.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.Random;
 
-import static java.lang.Math.pow;
-import static java.lang.Math.sqrt;
+public class googlemapActivity extends AppCompatActivity implements OnMapReadyCallback {
 
-public class googlemapActivity extends AppCompatActivity {
+    //구글맵
+    private static GoogleMap googleMap;
+//    private static PolylineOptions polylineOptions;
+//    private static ArrayList<LatLng> arraySOS;
 
-    private static ArrayList<SOSInfo> sosLocations = new ArrayList<SOSInfo>();
     private DatabaseReference mFirebaseDatabase;
     private FirebaseDatabase mFirebaseInstance;
     private DatabaseReference mSOSRef;
@@ -44,6 +49,22 @@ public class googlemapActivity extends AppCompatActivity {
     Button find_btn;
     int counter;
 
+    public static String[] mColors = {
+            "#3079ab", // dark blue
+            "#c25975", // mauve
+            "#e15258", // red
+            "#f9845b", // orange
+            "#838cc7", // lavender
+            "#7d669e", // purple
+            "#53bbb4", // aqua
+            "#51b46d", // green
+            "#e0ab18", // mustard
+            "#637a91", // dark gray
+            "#f092b0", // pink
+            "#b7c0c7"  // light gray
+    };
+    static String color = "";
+    static int colorAsInt;
     @Override
     protected void onStart() {
 
@@ -65,61 +86,16 @@ public class googlemapActivity extends AppCompatActivity {
                 for(SOSInfo sosinfo : sosInfos){
                     Log.d("배열에 저장된값들: ", ""+sosinfo.helper_id+sosinfo.sos_id);
                 }
+                googleMap.clear();
                 find_sos(sosInfos);
             }
         });
+
+        FragmentManager fragmentManager = getFragmentManager();
+        MapFragment mapFragment = (MapFragment)fragmentManager
+                .findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
     }
-//대안 1
-    public static Location getLocationWithTrilateration(SOSInfo A, SOSInfo B, SOSInfo C){
-        double W, Z, foundBeaconLat, foundBeaconLong, foundBeaconLongFilter;
-
-        SOSInfo find_location;
-        double bAlat = A.getLatitude();
-        double bAlong = A.getLongitude();
-        double bBlat = B.getLatitude();
-        double bBlong = B.getLongitude();
-        double bClat = C.getLatitude();
-        double bClong = C.getLongitude();
-        double distanceA = Math.round(A.getDistance()*100)/100.0;
-        double distanceB = Math.round(B.getDistance()*100)/100.0;
-        double distanceC = Math.round(C.getDistance()*100)/100.0;
-        Log.d("절대 좌표값", bAlat+"/"+bAlong+"/"+bBlat+"/"+bBlong+"/"+bClat+"/"+bClong);
-
-//        //절대 좌표
-//        double Xlat = 0;
-//        double Xlong = 0;
-//        double Ylat = (Math.round((bAlat-bBlat)*1000000)*1.1*100000)/1000000.0;
-//        double Ylong = (Math.round((bAlong-bBlong)*1000000)*0.9*100000)/1000000.0;
-//        double Zlat = (Math.round((bAlat-bClat)*10000000)*1.1*100000)/1000000.0;
-//        double Zlong = (Math.round((bAlong-bClong)*1000000)*0.9*100000)/1000000.0;
-//        Log.d("절대 좌표값", Xlat+"/"+Xlong+"/"+Ylat+"/"+Ylong+"/"+Zlat+"/"+Zlong);
-//
-//        bAlat = 0;
-//        bAlong = 0;
-//        bBlat = Ylat;
-//        bBlong = Ylong;
-//        bClat = Zlat;
-//        bClong = Zlong;
-
-        W = distanceA * distanceA - distanceB * distanceB - bAlat * bAlat - bAlong * bAlong + bBlat * bBlat + bBlong * bBlong;
-        Z = distanceB * distanceB - distanceC * distanceC - bBlat * bBlat - bBlong * bBlong + bClat * bClat + bClong * bClong;
-
-        foundBeaconLat = (W * (bClong - bBlong) - Z * (bBlong - bAlong)) / (2 * ((bBlat - bAlat) * (bClong - bBlong) - (bClat - bBlat) * (bBlong - bAlong)));
-        foundBeaconLong = (W - 2 * foundBeaconLat * (bBlat - bAlat)) / (2 * (bBlong - bAlong));
-        //`foundBeaconLongFilter` is a second measure of `foundBeaconLong` to mitigate errors
-        foundBeaconLongFilter = (Z - 2 * foundBeaconLat * (bClat - bBlat)) / (2 * (bClong - bBlong));
-
-        foundBeaconLong = (foundBeaconLong + foundBeaconLongFilter) / 2;
-
-        Location foundLocation = new Location("Location");
-        foundLocation.setLatitude(foundBeaconLat);
-        foundLocation.setLongitude(foundBeaconLong);
-        Log.d("잘 찾았나요?","위도"+foundBeaconLat+"경도"+foundBeaconLong);
-        find_location = new SOSInfo(0, A.sos_id, 0,foundBeaconLong, foundBeaconLat);
-        sosLocations.add(find_location);
-        return foundLocation;
-    }
-
 
     public void sos_checking(){
 
@@ -206,6 +182,7 @@ public class googlemapActivity extends AppCompatActivity {
             }
             if(counter==3){
                 Log.d("finder[0~2]",finder[0].helper_id+"/"+finder[1].helper_id+"/"+finder[2].helper_id);
+                MarkerOptions makerOptions = new MarkerOptions();
                 Compute(finder[0],finder[1],finder[2]);
                 check_id = -1;
                 counter =0;
@@ -218,12 +195,26 @@ public class googlemapActivity extends AppCompatActivity {
         double c,d,f,g,h;
         double[] i=new double[2];
         double k;
+
         c=p2.getLatitude()-p1.getLatitude();
         d=p2.getLongitude()-p1.getLongitude();
-        f=(180/Math.PI)*Math.acos( Math.abs(c)/Math.abs(Math.sqrt(Math.pow(c,2)+Math.pow(d,2))));
-        if((c>0&&d>0)){f=360-f;}
-        else if((c<0&&d>0)){f=180+f;}
-        else if((c<0&&d<0)){f=180-f;}
+        f=(180/Math.PI)*Math.acos(Math.abs(c)/Math.abs(Math.sqrt(Math.pow(c,2)+Math.pow(d,2))));
+
+        if((c>0&&d>0))
+        {
+            f=360-f;
+        }
+
+        else if((c<0&&d>0))
+        {
+            f=180+f;
+        }
+
+        else if((c<0&&d<0))
+        {
+            f=180-f;
+        }
+
         a=C(c,d,B(A(D(p2.getDistance()))),f);
         b=C(p3.getLatitude()-p1.getLatitude(),p3.getLongitude()-p1.getLongitude(),B(A(D(p3.getDistance()))),f);
         g=(Math.pow(B(A(D(p1.getDistance()))),2)-Math.pow(a[2],2)+Math.pow(a[0],2))/(2*a[0]);
@@ -233,9 +224,29 @@ public class googlemapActivity extends AppCompatActivity {
         i[1]=i[1]+p1.getLongitude();
         k=E(i[0],i[1],p1.getLatitude(),p1.getLongitude());
         Log.d("latitude/longitude", i[0]+"/"+i[1]);
-        if(k>p1.getDistance()*2){i=null;}else{
-            if(i[0]<-90||i[0]>90||i[1]<-180||i[1]>180){i=null;}}
+        //오차에 대한 생략
+//        if(k>p1.getDistance()*2){i=null;}else{
+//            if(i[0]<-90||i[0]>90||i[1]<-180||i[1]>180){i=null;}}
         Log.d("k/p1.getDistance()*2", k+"/"+p1.getDistance()*2);
+
+
+        //조난신호 마커생성
+        MarkerOptions makerOptions = new MarkerOptions();
+        makerOptions // LatLng에 대한 어레이를 만들어서 이용할 수도 있다.
+                .position(new LatLng(i[0], i[1]))
+                .title("조난 신호");// 타이틀.
+        googleMap.addMarker(makerOptions);
+
+        Random randomGenerator = new Random(); // Construct a new Random number generator
+        int randomNumber = randomGenerator.nextInt(mColors.length);
+
+        color = mColors[randomNumber];
+        colorAsInt = getColorWithAlpha(Color.parseColor(color), 0.2f);
+        addHelper_marker(p1);
+        addHelper_marker(p2);
+        addHelper_marker(p3);
+        // 2. 마커 생성 (마커를 나타냄)
+
         return i;
     }
     private static double A(double a){return a*7.2;}
@@ -244,5 +255,39 @@ public class googlemapActivity extends AppCompatActivity {
     private static double D(double a){return 730.24198315+52.33325511*a+1.35152407*Math.pow(a,2)+0.01481265*Math.pow(a,3)+0.00005900*Math.pow(a,4)+0.00541703*180;}
     private static double E(double a,double b,double c,double d){double e=Math.PI,f=e*a/180,g=e*c/180,h=b-d,i=e*h/180,j=Math.sin(f)*Math.sin(g)+Math.cos(f)*Math.cos(g)*Math.cos(i);if(j>1){j=1;}j=Math.acos(j);j=j*180/e;j=j*60*1.1515;j=j*1.609344;return j;}
 
+    @Override
+    public void onMapReady(GoogleMap map) {
+        LatLng Dongguk = new LatLng(37.558384, 127.000139);
+        googleMap = map;
+        MarkerOptions markerOptions = new MarkerOptions();
+        markerOptions.position(Dongguk);
+        markerOptions.title("동국대학교");
+        markerOptions.snippet("스마트시티");
+        map.addMarker(markerOptions);
+
+        map.moveCamera(CameraUpdateFactory.newLatLng(Dongguk));
+        map.animateCamera(CameraUpdateFactory.zoomTo(13));
+    }
+
+    public static void addHelper_marker(SOSInfo p){
+
+        googleMap.addCircle(new CircleOptions()
+                .center(new LatLng(p.getLatitude(), p.getLongitude()))
+                .radius(p.getDistance()*2000)
+                .strokeColor(Color.GREEN)
+                .strokeWidth(0)
+                .fillColor(getColorWithAlpha(colorAsInt, 0.7f))
+                .strokeColor(5)
+        );
+    }
+    public static int getColorWithAlpha(int color, float ratio) {
+        int newColor = 0;
+        int alpha = Math.round(Color.alpha(color) * ratio);
+        int r = Color.red(color);
+        int g = Color.green(color);
+        int b = Color.blue(color);
+        newColor = Color.argb(alpha, r, g, b);
+        return newColor;
+    }
 
 }
