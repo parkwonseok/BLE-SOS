@@ -3,6 +3,7 @@ package org.techtown.blecommunication;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -33,6 +34,7 @@ public class Scan2 extends AppCompatActivity {
         String time = data.substring(5, 16);
         String sick = data.substring(16, 17);
         batLen = data.substring(17);
+        Log.d("data", data);
         if(batLen.length() == 2){
             battery = batLen.substring(0, 1);
         }
