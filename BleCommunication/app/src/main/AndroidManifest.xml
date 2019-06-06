@@ -22,7 +22,6 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyBcj2vQ-zSKRhED4dta-aJOPBdIjEhx3sM" />
 
-        <activity android:name=".googlemapActivity" />
         <activity android:name=".WitnessActivity" />
         <activity
             android:name=".LoginActivity"

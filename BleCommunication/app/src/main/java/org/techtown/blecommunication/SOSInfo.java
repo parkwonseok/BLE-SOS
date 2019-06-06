@@ -14,12 +14,15 @@ public class SOSInfo {
     //위도
     public double latitude;
 
-    SOSInfo(int helper_id, int sos_id, double distance, double longitude, double latitude){
+    public String sosData;
+
+    SOSInfo(int helper_id, int sos_id, double distance, double longitude, double latitude, String sosData){
         this.helper_id = helper_id;
         this.sos_id = sos_id;
         this.distance = distance;
         this.longitude = longitude;
         this.latitude = latitude;
+        this.sosData = sosData;
         Log.d("블루투스로 확인된 내용", "구조자 블루투스 검색 목록 추가 완료");
     }
 

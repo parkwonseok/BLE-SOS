@@ -51,7 +51,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 
-public class map_findActivity extends FragmentActivity implements OnMapReadyCallback {
+public class map_findActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnInfoWindowClickListener {
 
     private static final String TAG = "TAG내용";
     private static final int GPS_ENABLE_REQUEST_CODE = 2001;
@@ -88,6 +88,7 @@ public class map_findActivity extends FragmentActivity implements OnMapReadyCall
     double distance;
     double longitude;
     double latitude;
+    String sosData;
     ArrayList<SOSInfo> sosInfos = new ArrayList<SOSInfo>();
     SOSInfo[] finder = new SOSInfo[3];
     SOSInfo sosInfo;
@@ -606,8 +607,9 @@ public class map_findActivity extends FragmentActivity implements OnMapReadyCall
                     distance = sos.child("distance").getValue(double.class);
                     latitude = sos.child("latitude").getValue(double.class);
                     longitude = sos.child("longitude").getValue(double.class);
+                    sosData = sos.child("sos_content").getValue(String.class);
                     Log.d("values : ", "distanc:"+ distance+"latitude:"+latitude+"longitude"+longitude);
-                    sosInfo = new SOSInfo(helper_id, Integer.parseInt(sos_id1), distance, longitude, latitude);
+                    sosInfo = new SOSInfo(helper_id, Integer.parseInt(sos_id1), distance, longitude, latitude, sosData);
                     sosInfos.add(sosInfo);
                 }
             }
@@ -655,15 +657,78 @@ public class map_findActivity extends FragmentActivity implements OnMapReadyCall
     public void Compute(SOSInfo p1, SOSInfo p2, SOSInfo p3){
         double sum = p1.distance+p2.distance+p3.distance;
         double[] i = new double[2];
-        i[0]= (p1.latitude+p2.latitude+p3.latitude)/3;
-        i[1]= (p1.longitude+p2.longitude+p3.longitude)/3;
+        StringBuilder scanData = new StringBuilder();
+        String batLe;
+        String batLen[] = new String[10];
+        String battery;
+        String id;
+        String num;
+        String time;
+        String sick;
+        if(android.os.Build.VERSION.SDK_INT >= 26) {
+            String data = p1.sosData;
+            id = data.substring(0, 4);
+            num = data.substring(4, 5);
+//            time = data.substring(5, 16);
+            time = "123";
+//            sick = data.substring(16, 17);
+            sick = "123123";
+//            batLen = data.substring(17).split(",");
+            battery = "123";
+//            battery = batLen[0];
+        }
+        else {
+            String data = p1.sosData;
+            id = data.substring(0, 4);
+            num = data.substring(4, 5);
+            time = data.substring(5, 16);
+            sick = data.substring(16, 17);
+            batLe = data.substring(17);
+            Log.d("data", data);
+            if (batLe.length() == 2) {
+                battery = batLe.substring(0, 1);
+            } else if (batLe.length() == 3) {
+                battery = batLe.substring(0, 2);
+            } else {
+                battery = "100";
+            }
+        }
+        scanData.append("   -  회원 ID : " + id);
+        scanData.append("\n   -  조난인원 : " + num);
+        scanData.append("\n   -  조난일시 : " + time);
+        if(sick.equals("0")){
+            scanData.append("\n   -  현재상태 : 이상 없음");
+        }
+        else if(sick.equals("1")){
+            scanData.append("\n   -  현재상태 : 골절");
+        }
+        else if(sick.equals("2")){
+            scanData.append("\n   -  현재상태 : 출혈");
+        }
+        else if(sick.equals("3")){
+            scanData.append("\n   -  현재상태 : 골절, 출혈");
+        }
+        else if(sick.equals("4")){
+            scanData.append("\n   -  현재상태 : 염좌(삠)");
+        }
+        else if(sick.equals("5")){
+            scanData.append("\n   -  현재상태 : 골절, 염좌(삠)");
+        }
+        else if(sick.equals("6")){
+            scanData.append("\n   -  현재상태 : 출혈, 염좌(삠)");
+        }
+        else if(sick.equals("7")){
+            scanData.append("\n   -  현재상태 : 골절, 출혈, 염좌(삠)");
+        }
+        scanData.append("\n   -  배터리 : " + battery + " %");
         i[0]= (p1.latitude*((p2.distance+p3.distance)/sum) + p2.latitude*((p1.distance+p3.distance)/sum) + p3.latitude*((p1.distance+p2.distance)/sum))/2;
         i[1]= (p1.longitude*((p2.distance+p3.distance)/sum) + p2.longitude*((p1.distance+p3.distance)/sum) + p3.longitude*((p1.distance+p2.distance)/sum))/2;
         Log.d("data value", "lat" + i[0] + "long" + i[1]);
         MarkerOptions makerOptions = new MarkerOptions();
         makerOptions // LatLng에 대한 어레이를 만들어서 이용할 수도 있다.
                 .position(new LatLng(i[0], i[1]))
-                .title("조난 신호")// 타이틀.
+                .title("조난자 정보")// 타이틀.
+                .snippet(scanData.toString())
                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.sos));
         mMap.addMarker(makerOptions);
 
@@ -697,5 +762,11 @@ public class map_findActivity extends FragmentActivity implements OnMapReadyCall
         int b = Color.blue(color);
         newColor = Color.argb(alpha, r, g, b);
         return newColor;
+    }
+
+    @Override
+    public void onInfoWindowClick(Marker marker) {
+        Toast.makeText(this, "Info window clicked",
+                Toast.LENGTH_SHORT).show();
     }
 }

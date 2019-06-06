@@ -227,7 +227,7 @@ public class Scan1 extends AppCompatActivity {
                 }
 
                 for (String key : sosDistance.keySet()) {
-                    addSOSList(Integer.parseInt(key), sosDistance.get(key), latitude, longitude);
+                    addSOSList(Integer.parseInt(key), sosDistance.get(key), latitude, longitude, sosData.get(key));
                 }
 
             }
@@ -237,7 +237,7 @@ public class Scan1 extends AppCompatActivity {
         show_bt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent1 = new Intent(getApplicationContext(), googlemapActivity.class);
+                Intent intent1 = new Intent(getApplicationContext(), map_findActivity.class);
                 startActivity(intent1);
 
             }
@@ -307,7 +307,7 @@ public class Scan1 extends AppCompatActivity {
                     rssiList.add((double) rssi);
                     sosRssi.put(key, rssiList);
                 } else if (rssiList.size() == 20) {
-                    sosDistance.put(key, getDistance(1.55, -56, kalman(rssiList, 50.0, 0.008)))
+                    sosDistance.put(key, getDistance(1.55, -56, kalman(rssiList, 50.0, 0.008)));
                     sosData.put(key, advData);
                 }
 
@@ -437,7 +437,7 @@ public class Scan1 extends AppCompatActivity {
         return sum1;
     }
 
-    public void addSOSList(int SOS_id, double distance, double latitude, double longitude) {
+    public void addSOSList(int SOS_id, double distance, double latitude, double longitude, String sosData) {
         mDbOpenHelper = new DbOpenHelper(this);
         mDbOpenHelper.open();
         mCursor = null;
@@ -453,7 +453,7 @@ public class Scan1 extends AppCompatActivity {
 
         mFirebaseDatabase.child("sos_info").child(String.valueOf(SOS_id)).child(String.valueOf(fire_id)).child("longitude").setValue(longitude);
 
-//        mFirebaseDatabase.child("sos_info").child(String.valueOf(SOS_id)).child(String.valueOf(fire_id)).child("sos_content").setValue(sos_content);
+        mFirebaseDatabase.child("sos_info").child(String.valueOf(SOS_id)).child(String.valueOf(fire_id)).child("sos_content").setValue(sosData);
     }
 
     final LocationListener gpsLocationListener = new LocationListener() {
@@ -484,10 +484,9 @@ public class Scan1 extends AppCompatActivity {
         List<Address> addresses;
 
         try {
-
             addresses = geocoder.getFromLocation(
-                    latlng.latitude,
-                    latlng.longitude,
+                    latitude = latlng.latitude,
+                    longitude = latlng.longitude,
                     1);
         } catch (IOException ioException) {
             //네트워크 문제
@@ -704,7 +703,8 @@ public class Scan1 extends AppCompatActivity {
                 String markerTitle = getCurrentAddress(currentPosition);
                 String markerSnippet = "위도:" + String.valueOf(location.getLatitude())
                         + " 경도:" + String.valueOf(location.getLongitude());
-
+                latitude = location.getLatitude();
+                longitude = location.getLongitude();
                 Log.d(TAG, "onLocationResult : " + markerSnippet);
 
 
