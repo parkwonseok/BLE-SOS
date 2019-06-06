@@ -449,6 +449,8 @@ public class Scan1 extends AppCompatActivity {
         mFirebaseDatabase.child("sos_info").child(String.valueOf(SOS_id)).child(String.valueOf(fire_id)).child("latitude").setValue(latitude);
 
         mFirebaseDatabase.child("sos_info").child(String.valueOf(SOS_id)).child(String.valueOf(fire_id)).child("longitude").setValue(longitude);
+
+//        mFirebaseDatabase.child("sos_info").child(String.valueOf(SOS_id)).child(String.valueOf(fire_id)).child("sos_content").setValue(sos_content);
     }
 
     final LocationListener gpsLocationListener = new LocationListener() {

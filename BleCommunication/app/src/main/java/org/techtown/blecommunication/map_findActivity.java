@@ -37,20 +37,26 @@ import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Random;
 
 public class map_findActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private static final String TAG = "TAG내용";
     private static final int GPS_ENABLE_REQUEST_CODE = 2001;
-    private static final int UPDATE_INTERVAL_MS = 5000;  // 5초
-    private static final int FASTEST_UPDATE_INTERVAL_MS = 2000; // 2초
+    private static final int UPDATE_INTERVAL_MS = 30000;  // 5초
+    private static final int FASTEST_UPDATE_INTERVAL_MS = 20000; // 2초
 
     private static final int PERMISSIONS_REQUEST_CODE = 100;
     boolean needRequest = false;
@@ -126,6 +132,18 @@ public class map_findActivity extends FragmentActivity implements OnMapReadyCall
         builder.addLocationRequest(locationRequest);
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
+        find_btn = findViewById(R.id.find_btn);
+        find_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                for(SOSInfo sosinfo : sosInfos){
+                    Log.d("배열에 저장된값들: ", ""+sosinfo.helper_id+sosinfo.sos_id);
+                }
+                mMap.clear();
+                find_sos(sosInfos);
+            }
+        });
     }
 
     LocationCallback locationCallback = new LocationCallback(){
@@ -287,6 +305,7 @@ public class map_findActivity extends FragmentActivity implements OnMapReadyCall
                 mMap.setMyLocationEnabled(true);
 
         }
+        sos_checking();
     }
 
 
@@ -328,10 +347,10 @@ public class map_findActivity extends FragmentActivity implements OnMapReadyCall
 
         }
 
-        mMap.clear();
+//        mMap.clear();
 
         if (addresses == null || addresses.size() == 0) {
-            Toast.makeText(this, "주소 미발견", Toast.LENGTH_LONG).show();
+//            Toast.makeText(this, "주소 미발견", Toast.LENGTH_LONG).show();
             return "주소 미발견";
 
         } else {
@@ -374,7 +393,7 @@ public class map_findActivity extends FragmentActivity implements OnMapReadyCall
 
         CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLng(currentLatLng);
         mMap.moveCamera(cameraUpdate);
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(17.0f));
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(18.0f));
 
     }
 
@@ -540,5 +559,143 @@ public class map_findActivity extends FragmentActivity implements OnMapReadyCall
     }
 
 
+    public void sos_checking(){
 
+        //firebase 연결
+        mFirebaseInstance = FirebaseDatabase.getInstance();
+
+        //referencce 초기 설정("DataUsers/")
+        mFirebaseDatabase = mFirebaseInstance.getReference("DataUsers");
+
+        //참조값
+        mSOSRef = mFirebaseDatabase.child("sos_info");
+        mSOSRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                for (DataSnapshot sos : dataSnapshot.getChildren()) {
+                    //sos_id
+                    sos_id = Integer.parseInt(sos.getKey());
+                    Log.d("sos_id", sos.getKey());
+                    get_helper_id(sos.getKey(), mSOSRef);
+                    Log.d("count", String.valueOf(sos.getChildrenCount()));
+
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+
+
+        });
+
+    }
+
+    public void get_helper_id(final String sos_id1, DatabaseReference Ref){
+
+        DatabaseReference Helper_id_Ref = Ref.child(sos_id1);
+        Helper_id_Ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot sos : dataSnapshot.getChildren()){
+                    helper_id = Integer.parseInt(sos.getKey());
+                    Log.d("sos_id/helper_id", sos_id1 +"/"+sos.getKey());
+                    Log.d("해당하는 조난자 갯수", String.valueOf(sos.getChildrenCount()));
+                    distance = sos.child("distance").getValue(double.class);
+                    latitude = sos.child("latitude").getValue(double.class);
+                    longitude = sos.child("longitude").getValue(double.class);
+                    Log.d("values : ", "distanc:"+ distance+"latitude:"+latitude+"longitude"+longitude);
+                    sosInfo = new SOSInfo(helper_id, Integer.parseInt(sos_id1), distance, longitude, latitude);
+                    sosInfos.add(sosInfo);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    public void find_sos(ArrayList<SOSInfo> sosInfos){
+        counter = 0;
+        int check_id = -1;
+        for(SOSInfo sosinfo: sosInfos){
+            //처음 시작부분
+            if(check_id == -1){
+                check_id = sosinfo.sos_id;
+                Log.d("check_id", check_id+"");
+                finder[counter] = sosinfo;
+                counter++;
+            }
+
+            else if(check_id == sosinfo.sos_id){
+                finder[counter] = sosinfo;
+                Log.d("check_id", check_id+"");
+                counter++;
+            }
+            else{
+                Log.d("check_id", check_id+"");
+                counter = 1;
+                check_id = sosinfo.sos_id;
+                finder[0] = sosinfo;
+            }
+            if(counter==3){
+                Log.d("finder[0~2]",finder[0].helper_id+"/"+finder[1].helper_id+"/"+finder[2].helper_id);
+                MarkerOptions makerOptions = new MarkerOptions();
+                Compute(finder[0],finder[1],finder[2]);
+                check_id = -1;
+                counter =0;
+            }
+        }
+    }
+
+    public void Compute(SOSInfo p1, SOSInfo p2, SOSInfo p3){
+        double sum = p1.distance+p2.distance+p3.distance;
+        double[] i = new double[2];
+        i[0]= (p1.latitude+p2.latitude+p3.latitude)/3;
+        i[1]= (p1.longitude+p2.longitude+p3.longitude)/3;
+        i[0]= (p1.latitude*((p2.distance+p3.distance)/sum) + p2.latitude*((p1.distance+p3.distance)/sum) + p3.latitude*((p1.distance+p2.distance)/sum))/2;
+        i[1]= (p1.longitude*((p2.distance+p3.distance)/sum) + p2.longitude*((p1.distance+p3.distance)/sum) + p3.longitude*((p1.distance+p2.distance)/sum))/2;
+        Log.d("data value", "lat" + i[0] + "long" + i[1]);
+        MarkerOptions makerOptions = new MarkerOptions();
+        makerOptions // LatLng에 대한 어레이를 만들어서 이용할 수도 있다.
+                .position(new LatLng(i[0], i[1]))
+                .title("조난 신호")// 타이틀.
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.sos));
+        mMap.addMarker(makerOptions);
+
+        Random randomGenerator = new Random(); // Construct a new Random number generator
+        int randomNumber = randomGenerator.nextInt(mColors.length);
+
+        color = mColors[randomNumber];
+        colorAsInt = getColorWithAlpha(Color.parseColor(color), 0.2f);
+        addHelper_marker(p1);
+        addHelper_marker(p2);
+        addHelper_marker(p3);
+
+    }
+
+    public void addHelper_marker(SOSInfo p){
+
+        mMap.addCircle(new CircleOptions()
+                .center(new LatLng(p.getLatitude(), p.getLongitude()))
+                .radius(p.getDistance()*2000)
+                .strokeColor(Color.GREEN)
+                .strokeWidth(0)
+                .fillColor(getColorWithAlpha(colorAsInt, 0.7f))
+                .strokeColor(5)
+        );
+    }
+    public static int getColorWithAlpha(int color, float ratio) {
+        int newColor = 0;
+        int alpha = Math.round(Color.alpha(color) * ratio);
+        int r = Color.red(color);
+        int g = Color.green(color);
+        int b = Color.blue(color);
+        newColor = Color.argb(alpha, r, g, b);
+        return newColor;
+    }
 }

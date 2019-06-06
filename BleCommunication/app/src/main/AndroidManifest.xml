@@ -33,6 +33,7 @@
             android:name=".LoginActivity"
             android:noHistory="true">
 
+
         </activity>
         <activity android:name=".Scan3" />
         <activity android:name=".Advertise3" />
