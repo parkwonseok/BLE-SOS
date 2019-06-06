@@ -11,8 +11,13 @@ import android.widget.TextView;
 public class Scan2 extends AppCompatActivity {
     TextView textView;
     String scanData;
+    String batLe;
     String batLen[] = new String[10];
     String battery;
+    String id;
+    String num;
+    String time;
+    String sick;
 
     public static final int REQUEST_CODE_SCAN3 = 203;   // Scan3 액티비티 요청 상수
     public static final int REQUEST_CODE_SCAN1 = 202;   // Scan1 액티비티 요청 상수
@@ -28,29 +33,31 @@ public class Scan2 extends AppCompatActivity {
         Intent intent = getIntent();
         getIntentData(intent);
 
-        String data = scanData.substring(16);
-        String id = data.substring(0, 4);
-        String num = data.substring(4, 5);
-        String time = data.substring(5, 16);
-        String sick = data.substring(16, 17);
-        batLen = data.substring(17).split(",");
-        battery = batLen[0];
-        /*String data = scanData.substring(48);
-        String id = data.substring(0, 4);
-        String num = data.substring(4, 5);
-        String time = data.substring(5, 16);
-        String sick = data.substring(16, 17);
-        batLen = data.substring(17);
-        Log.d("data", data);
-        if(batLen.length() == 2){
-            battery = batLen.substring(0, 1);
+        if(android.os.Build.VERSION.SDK_INT >= 26) {
+            String data = scanData.substring(16);
+            id = data.substring(0, 4);
+            num = data.substring(4, 5);
+            time = data.substring(5, 16);
+            sick = data.substring(16, 17);
+            batLen = data.substring(17).split(",");
+            battery = batLen[0];
         }
-        else if(batLen.length() == 3){
-            battery = batLen.substring(0, 2);
+        else {
+            String data = scanData.substring(48);
+            id = data.substring(0, 4);
+            num = data.substring(4, 5);
+            time = data.substring(5, 16);
+            sick = data.substring(16, 17);
+            batLe = data.substring(17);
+            Log.d("data", data);
+            if (batLe.length() == 2) {
+                battery = batLe.substring(0, 1);
+            } else if (batLe.length() == 3) {
+                battery = batLe.substring(0, 2);
+            } else {
+                battery = "100";
+            }
         }
-        else{
-            battery = "100";
-        }*/
         textView.append("   -  회원 ID : " + id);
         textView.append("\n   -  조난인원 : " + num);
         textView.append("\n   -  조난일시 : " + time);
