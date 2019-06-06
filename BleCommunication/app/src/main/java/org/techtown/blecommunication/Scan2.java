@@ -10,7 +10,7 @@ import android.widget.TextView;
 public class Scan2 extends AppCompatActivity {
     TextView textView;
     String scanData;
-    String batLen;
+    String batLen[] = new String[10];
     String battery;
 
     public static final int REQUEST_CODE_SCAN3 = 203;   // Scan3 액티비티 요청 상수
@@ -27,7 +27,14 @@ public class Scan2 extends AppCompatActivity {
         Intent intent = getIntent();
         getIntentData(intent);
 
-        String data = scanData.substring(48);
+        String data = scanData.substring(16);
+        String id = data.substring(0, 4);
+        String num = data.substring(4, 5);
+        String time = data.substring(5, 16);
+        String sick = data.substring(16, 17);
+        batLen = data.substring(17).split(",");
+        battery = batLen[0];
+        /*String data = scanData.substring(48);
         String id = data.substring(0, 4);
         String num = data.substring(4, 5);
         String time = data.substring(5, 16);
@@ -41,7 +48,7 @@ public class Scan2 extends AppCompatActivity {
         }
         else{
             battery = "100";
-        }
+        }*/
         textView.append("   -  회원 ID : " + id);
         textView.append("\n   -  조난인원 : " + num);
         textView.append("\n   -  조난일시 : " + time);
