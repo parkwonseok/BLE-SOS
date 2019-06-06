@@ -99,7 +99,7 @@ public class Scan1 extends AppCompatActivity {
         }
         else{
             Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-            lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
+            lm.requestLocationUpdates(LocationManager.GPS_PROVIDER,
                     1000,
                     1,
                     gpsLocationListener);

@@ -284,4 +284,28 @@ public class googlemapActivity extends AppCompatActivity implements OnMapReadyCa
         return newColor;
     }
 
+    public static void fake(SOSInfo p1,SOSInfo p2,SOSInfo p3){
+        double[] i=new double[2];
+        double[] sum = {p1.distance,p2.distance,p3.distance};
+
+        MarkerOptions makerOptions = new MarkerOptions();
+        makerOptions // LatLng에 대한 어레이를 만들어서 이용할 수도 있다.
+                .position(new LatLng(i[0], i[1]))
+                .title("조난 신호");// 타이틀.
+        googleMap.addMarker(makerOptions);
+
+        Random randomGenerator = new Random(); // Construct a new Random number generator
+        int randomNumber = randomGenerator.nextInt(mColors.length);
+
+        color = mColors[randomNumber];
+        colorAsInt = getColorWithAlpha(Color.parseColor(color), 0.2f);
+        addHelper_marker(p1);
+        addHelper_marker(p2);
+        addHelper_marker(p3);
+    }
+
+    public static void sort(double[] number){
+
+    }
+
 }
