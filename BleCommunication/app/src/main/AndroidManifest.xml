@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="org.techtown.blecommunication">
-
+    <!-- 네트워크 상태 조회 -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
@@ -14,20 +15,23 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyBcj2vQ-zSKRhED4dta-aJOPBdIjEhx3sM" />
-        <activity android:name=".googlemapActivity"></activity>
-        <activity android:name=".WitnessActivity" />
-        <activity
-            android:name=".LoginActivity"
-            android:noHistory="true">
+        <activity android:name=".map_findActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyBcj2vQ-zSKRhED4dta-aJOPBdIjEhx3sM" />
+
+        <activity android:name=".googlemapActivity" />
+        <activity android:name=".WitnessActivity" />
+        <activity
+            android:name=".LoginActivity"
+            android:noHistory="true">
 
         </activity>
         <activity android:name=".Scan3" />
@@ -36,8 +40,7 @@
         <activity android:name=".Scan1" />
         <activity android:name=".Advertise2" />
         <activity android:name=".Advertise1" />
-        <activity android:name=".MainActivity">
-        </activity>
+        <activity android:name=".MainActivity"></activity>
     </application>
 
 </manifest>

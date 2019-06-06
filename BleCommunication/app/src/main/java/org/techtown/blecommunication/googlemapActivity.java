@@ -286,7 +286,9 @@ public class googlemapActivity extends AppCompatActivity implements OnMapReadyCa
 
     public static void fake(SOSInfo p1,SOSInfo p2,SOSInfo p3){
         double[] i=new double[2];
-        double[] sum = {p1.distance,p2.distance,p3.distance};
+        double sum = p1.distance+p2.distance+p3.distance;
+
+
 
         MarkerOptions makerOptions = new MarkerOptions();
         makerOptions // LatLng에 대한 어레이를 만들어서 이용할 수도 있다.
@@ -304,8 +306,5 @@ public class googlemapActivity extends AppCompatActivity implements OnMapReadyCa
         addHelper_marker(p3);
     }
 
-    public static void sort(double[] number){
-
-    }
 
 }
