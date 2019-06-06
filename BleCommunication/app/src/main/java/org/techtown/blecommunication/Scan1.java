@@ -76,6 +76,8 @@ public class Scan1 extends AppCompatActivity {
     ListView listView;
     SimpleAdapter simpleAdapter;
 
+    // Map < 조난자id, 패킷데이터 >
+    HashMap<String, String> sosData = new HashMap<>();
     // Map < 조난자id, rssi값 20개 >
     HashMap<String, Object> sosRssi = new HashMap<>();
     // Map < 조난자id, 거리 >
@@ -305,7 +307,8 @@ public class Scan1 extends AppCompatActivity {
                     rssiList.add((double) rssi);
                     sosRssi.put(key, rssiList);
                 } else if (rssiList.size() == 20) {
-                    sosDistance.put(key, getDistance(1.55, -56, kalman(rssiList, 50.0, 0.008)));
+                    sosDistance.put(key, getDistance(1.55, -56, kalman(rssiList, 50.0, 0.008)))
+                    sosData.put(key, advData);
                 }
 
                 testView.setText("RSSI 개수 : " + String.valueOf(rssiList.size()));
