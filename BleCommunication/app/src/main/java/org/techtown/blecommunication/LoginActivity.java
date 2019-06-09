@@ -3,7 +3,6 @@ package org.techtown.blecommunication;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.SQLException;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -11,14 +10,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
-import android.widget.TextView;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.MutableData;
-import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
 
 public class  LoginActivity extends AppCompatActivity {
@@ -89,8 +85,6 @@ public class  LoginActivity extends AppCompatActivity {
         final EditText etContact = findViewById(R.id.etContact);
         final EditText etDisease = findViewById(R.id.etDisease);
         Button btSave = findViewById(R.id.btSave);
-        Button btfire = findViewById(R.id.btfire);
-        final TextView serverTv = findViewById(R.id.server_Tv);
 
 
         mDbOpenHelper = new DbOpenHelper(this);

@@ -82,6 +82,26 @@ public class WitnessActivity extends AppCompatActivity {
             public void onCancelled(DatabaseError databaseError) {
             }
         });
+
+
+        if ( Build.VERSION.SDK_INT >= 23 &&
+                ContextCompat.checkSelfPermission( getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION ) != PackageManager.PERMISSION_GRANTED ) {
+            ActivityCompat.requestPermissions( WitnessActivity.this, new String[] {  android.Manifest.permission.ACCESS_FINE_LOCATION  },
+                    0 );
+        }
+        else{
+            Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
+                    1000,
+                    1,
+                    gpsLocationListener);
+            String provider = location.getProvider();
+            longitude = location.getLongitude();
+            latitude = location.getLatitude();
+            Log.d(TAG, "위치정보 : " + provider + "\n" +
+                    "위도 : " + longitude + "\n" +
+                    "경도 : " + latitude + "\n");
+        }
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,24 +129,6 @@ public class WitnessActivity extends AppCompatActivity {
         mDbOpenHelper.open();
         getUserInfo();
 
-        if ( Build.VERSION.SDK_INT >= 23 &&
-                ContextCompat.checkSelfPermission( getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION ) != PackageManager.PERMISSION_GRANTED ) {
-            ActivityCompat.requestPermissions( WitnessActivity.this, new String[] {  android.Manifest.permission.ACCESS_FINE_LOCATION  },
-                    0 );
-        }
-        else{
-            Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-            lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
-                    1000,
-                    1,
-                    gpsLocationListener);
-            String provider = location.getProvider();
-            longitude = location.getLongitude();
-            latitude = location.getLatitude();
-            Log.d(TAG, "위치정보 : " + provider + "\n" +
-                    "위도 : " + longitude + "\n" +
-                    "경도 : " + latitude + "\n");
-        }
 
 
         submitBtn.setOnClickListener(new View.OnClickListener() {

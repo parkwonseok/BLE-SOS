@@ -125,25 +125,6 @@ public class Scan1 extends AppCompatActivity {
         mFirebaseInstance = FirebaseDatabase.getInstance();
         //referencce 초기 설정("DataUsers/")
         mFirebaseDatabase = mFirebaseInstance.getReference("DataUsers");
-//        if (Build.VERSION.SDK_INT >= 23 &&
-//                ContextCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-//            ActivityCompat.requestPermissions(Scan1.this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
-//                    0);
-//        } else {
-//            Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-//            lm.requestLocationUpdates(LocationManager.GPS_PROVIDER,
-//                    1000,
-//                    1,
-//                    gpsLocationListener);
-//            String provider = location.getProvider();
-//            longitude = location.getLongitude();
-//            latitude = location.getLatitude();
-//            Log.d("그치만,,,,", "위치정보 : " + provider + "\n" +
-//                    "위도 : " + longitude + "\n" +
-//                    "경도 : " + latitude + "\n");
-//        }
-
-        //위치 탐색
 
         locationRequest = new LocationRequest().setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
                 .setInterval(UPDATE_INTERVAL_MS)
@@ -242,37 +223,6 @@ public class Scan1 extends AppCompatActivity {
 
             }
         });
-
-
-        LocationCallback locationCallback = new LocationCallback() {
-            @Override
-            public void onLocationResult(LocationResult locationResult) {
-                super.onLocationResult(locationResult);
-
-                List<Location> locationList = locationResult.getLocations();
-
-                if (locationList.size() > 0) {
-                    location = locationList.get(locationList.size() - 1);
-                    //location = locationList.get(0);
-
-                    currentPosition
-                            = new LatLng(location.getLatitude(), location.getLongitude());
-
-                    longitude = location.getLongitude();
-                    latitude = location.getLatitude();
-//                    String markerTitle = getCurrentAddress(currentPosition);
-//                    String markerSnippet = "위도:" + String.valueOf(location.getLatitude())
-//                            + " 경도:" + String.valueOf(location.getLongitude();
-//                    Log.d("happy", "onLocationResult : " + markerSnippet);
-
-
-//                    //현재 위치에 마커 생성하고 이동
-//                    setCurrentLocation(location, markerTitle, markerSnippet);
-
-                    mCurrentLocatiion = location;
-                }
-            }
-        };
 
     }
 
