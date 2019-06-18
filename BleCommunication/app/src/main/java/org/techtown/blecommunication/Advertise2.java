@@ -8,6 +8,7 @@ import android.bluetooth.le.AdvertiseData;
 import android.bluetooth.le.AdvertiseSettings;
 import android.bluetooth.le.BluetoothLeAdvertiser;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Message;
@@ -28,6 +29,12 @@ public class Advertise2 extends AppCompatActivity {
     Set pairDevices1;
     Set pairDevices2;
     int size;
+
+    private DbOpenHelper mDbOpenHelper; //내부 DB 관리
+    private Cursor mCursor; // DB 관련
+    private UserInfo mUserInfo;
+    private int fire_id;
+
     String serviceData;   // 패킷에 넣을 데이터(조난자 정보)
     String bleUuid = "CDB7950D-73F1-4D4D-8E47-C090502DBD63";   // 패킷 id
     public static final int REQUEST_CODE_ADVERTISE1 = 102;   // Advertise1 액티비티 요청 상수
@@ -67,6 +74,35 @@ public class Advertise2 extends AppCompatActivity {
         pairDevices1 = bleAdapter.getBondedDevices();
         size = pairDevices1.size();
 
+        //내장 DB 실행
+        mDbOpenHelper = new DbOpenHelper(this);
+        mDbOpenHelper.open();
+
+        mCursor = null;
+        //DB에 있는 모든 컬럼을 가져옴
+        mCursor = mDbOpenHelper.getAllColumns();
+
+
+
+
+        //컬럼의 갯수 확인
+        mCursor = mDbOpenHelper.getAllColumns();
+        mCursor.moveToLast();
+        mUserInfo = new UserInfo(
+                mCursor.getInt(mCursor.getColumnIndex("_id")),
+                mCursor.getInt(mCursor.getColumnIndex("fire_id")),
+                mCursor.getString(mCursor.getColumnIndex("name")),
+                mCursor.getString(mCursor.getColumnIndex("gender")),
+                mCursor.getString(mCursor.getColumnIndex("birth")),
+                mCursor.getString(mCursor.getColumnIndex("contact")),
+                mCursor.getString(mCursor.getColumnIndex("disease"))
+        );
+        fire_id = mUserInfo.fire_id;
+
+        //Cursor 닫기
+        mCursor.close();
+
+
         // 이전 액티비티에서 조난자 정보 가져오기
         Intent intent = getIntent();
         getIntentData(intent);
@@ -91,6 +127,7 @@ public class Advertise2 extends AppCompatActivity {
         BackThread thread = new BackThread();
         thread.setDaemon(true);
         thread.start();
+
     }
 
     class BackThread extends Thread{
@@ -130,8 +167,11 @@ public class Advertise2 extends AppCompatActivity {
         if (intent != null) {
             Bundle bundle = intent.getExtras();
             AdvertiseInfo advertiseInfo = bundle.getParcelable("Data");   // 이전 액티비티에서의 조난자 정보를 합쳐 문자열 변수에 저장
+
+
+            String fire_id_str = String.format("%04d", fire_id);
             if (intent != null) {
-                final String str = "ID0000" + advertiseInfo.num + advertiseInfo.time + advertiseInfo.sick + advertiseInfo.battery;
+                final String str = "ID" + fire_id_str + advertiseInfo.num + advertiseInfo.time + advertiseInfo.sick + advertiseInfo.battery;
                 serviceData = str;
             }
         }
