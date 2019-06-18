@@ -64,6 +64,8 @@ public class Scan1 extends AppCompatActivity {
     // Map < 조난자id, 거리 >
     HashMap<String, Double> sosDistance = new HashMap<>();
 
+
+
     int check = 0;
     String isSOS;
 
@@ -233,13 +235,13 @@ public class Scan1 extends AppCompatActivity {
                     rssiList = (ArrayList<Double>) sosRssi.get(key);
                     inputData = new HashMap<String, String>();
                     inputData.put("data", "패킷데이터 : " + advData);
-                    inputData.put("distance", "<조난신호>     " + "rssi : " + String.valueOf(rssi) + "                  " + String.valueOf(rssiList.size())  + "  / 20");
+                    inputData.put("distance", "<조난신호>     " + "rssi : " + String.valueOf(rssi) + "                     " + String.valueOf(rssiList.size())  + "  / 20");
                 }
                 else {
                     rssiList = new ArrayList<>();
                     inputData = new HashMap<String, String>();
                     inputData.put("data", "패킷데이터 : " + advData);
-                    inputData.put("distance", "<조난신호>     " + "rssi : " + String.valueOf(rssi) + "                  " + " 1 / 20");
+                    inputData.put("distance", "<조난신호>     " + "rssi : " + String.valueOf(rssi) + "                     " + " 1 / 20");
                 }
                 if (rssiList.size() < 20) {
                     rssiList.add((double) rssi);
@@ -249,17 +251,81 @@ public class Scan1 extends AppCompatActivity {
                     sosData.put(key, advData);
                 }
 
-            } else {
-                if(isSOS.contains("n")){
-//                    inputData = new HashMap<String, String>();
-//                    inputData.put("data", "패킷데이터 : " + advData);
-//                    inputData.put("distance", "<알 수 없는 신호>     " + "rssi : " + String.valueOf(rssi));
-                }
-                else{
+            }else if(isSOS.contains("N")){
+                String key = advData.substring(2, 6);
+                ArrayList<Double> rssiList;
+
+                if (sosRssi.containsKey(key)) {
+                    rssiList = (ArrayList<Double>) sosRssi.get(key);
                     inputData = new HashMap<String, String>();
                     inputData.put("data", "패킷데이터 : " + advData);
-                    inputData.put("distance", "<알 수 없는 신호>     " + "rssi : " + String.valueOf(rssi));
+                    inputData.put("distance", "<라즈베리파이 노드>     " + "rssi : " + String.valueOf(rssi) + "           " + String.valueOf(rssiList.size())  + "  / 20");
                 }
+                else {
+                    rssiList = new ArrayList<>();
+                    inputData = new HashMap<String, String>();
+                    inputData.put("data", "패킷데이터 : " + advData);
+                    inputData.put("distance", "<라즈베리파이 노드>     " + "rssi : " + String.valueOf(rssi) + "           " + " 1 / 20");
+                }
+                if (rssiList.size() < 20) {
+                    rssiList.add((double) rssi);
+                    sosRssi.put(key, rssiList);
+                } else if (rssiList.size() == 20) {
+                    sosDistance.put(key, getDistance(1.55, -56, kalman(rssiList, 50.0, 0.008)));
+                    sosData.put(key, advData);
+                }
+            }else if(isSOS.contains("R")){
+                String key = advData.substring(2, 6);
+                ArrayList<Double> rssiList;
+
+                if (sosRssi.containsKey(key)) {
+                    rssiList = (ArrayList<Double>) sosRssi.get(key);
+                    inputData = new HashMap<String, String>();
+                    inputData.put("data", "패킷데이터 : " + advData);
+                    inputData.put("distance", "<라즈베리파이 응답>     " + "rssi : " + String.valueOf(rssi) + "           " + String.valueOf(rssiList.size())  + "  / 20");
+                }
+                else {
+                    rssiList = new ArrayList<>();
+                    inputData = new HashMap<String, String>();
+                    inputData.put("data", "패킷데이터 : " + advData);
+                    inputData.put("distance", "<라즈베리파이 응답>     " + "rssi : " + String.valueOf(rssi) + "           " + " 1 / 20");
+                }
+                if (rssiList.size() < 20) {
+                    rssiList.add((double) rssi);
+                    sosRssi.put(key, rssiList);
+                } else if (rssiList.size() == 20) {
+                    sosDistance.put(key, getDistance(1.55, -56, kalman(rssiList, 50.0, 0.008)));
+                    sosData.put(key, advData);
+                }
+            }
+            else {
+                if(advData == null) {
+
+                }
+                else {
+                    String key = advData;
+                    ArrayList<Double> rssiList;
+
+                    if (sosRssi.containsKey(key)) {
+                        rssiList = (ArrayList<Double>) sosRssi.get(key);
+                        inputData = new HashMap<String, String>();
+                        inputData.put("data", "장치 이름 : " + advData);
+                        inputData.put("distance", "<알 수 없는 장치>     " + "rssi : " + String.valueOf(rssi) + "           " + String.valueOf(rssiList.size()) + "  / 20");
+                    } else {
+                        rssiList = new ArrayList<>();
+                        inputData = new HashMap<String, String>();
+                        inputData.put("data", "장치 이름 : " + advData);
+                        inputData.put("distance", "<알 수 없는 장치>     " + "rssi : " + String.valueOf(rssi) + "           " + " 1 / 20");
+                    }
+                    if (rssiList.size() < 20) {
+                        rssiList.add((double) rssi);
+                        sosRssi.put(key, rssiList);
+                    } else if (rssiList.size() == 20) {
+                        sosDistance.put(key, getDistance(1.55, -56, kalman(rssiList, 50.0, 0.008)));
+                        sosData.put(key, advData);
+                    }
+                }
+
 
             }
 
@@ -302,16 +368,16 @@ public class Scan1 extends AppCompatActivity {
             @Override
             public void run() {
                 mScanSettings = new ScanSettings.Builder();
-                mScanSettings.setScanMode(ScanSettings.SCAN_MODE_BALANCED);
+                mScanSettings.setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY);
                 ScanSettings scanSettings = mScanSettings.build();
 
                 scanFilters = new Vector<>();
                 ScanFilter.Builder scanFilter = new ScanFilter.Builder();
-                scanFilter.setServiceUuid(ParcelUuid.fromString("CDB7950D-73F1-4D4D-8E47-C090502DBD63"));
+                //scanFilter.setServiceUuid(ParcelUuid.fromString("CDB7950D-73F1-4D4D-8E47-C090502DBD63"));
                 ScanFilter scan = scanFilter.build();
                 scanFilters.add(scan);
-                //bleScanner.startScan(scanFilters, scanSettings, bleScanCallback);
-                bleScanner.startScan(bleScanCallback);
+                bleScanner.startScan(scanFilters, scanSettings, bleScanCallback);
+                //bleScanner.startScan(bleScanCallback);
             }
         });
     }
