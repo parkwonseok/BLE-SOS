@@ -63,7 +63,6 @@ public class Scan1 extends AppCompatActivity {
     HashMap<String, Object> sosRssi = new HashMap<>();
     // Map < 조난자id, 거리 >
     HashMap<String, Double> sosDistance = new HashMap<>();
-    TextView testView;
 
     int check = 0;
     String isSOS;
@@ -156,7 +155,6 @@ public class Scan1 extends AppCompatActivity {
                 startActivityForResult(intent, REQUEST_SCAN2_ACTIVITY);
             }
         });
-        testView = findViewById(R.id.testView);
 
         //조난자 전송버튼
         senddt_bt.setOnClickListener(new View.OnClickListener() {
@@ -227,18 +225,22 @@ public class Scan1 extends AppCompatActivity {
                 isSOS = "no";
             }
             if (isSOS.equals("ID")) {
-                inputData = new HashMap<String, String>();
-                inputData.put("data", "패킷데이터 : " + advData);
-                inputData.put("distance", "<조난신호>     " + "rssi : " + String.valueOf(rssi));
-
                 // 삼각측량 부분
                 String key = advData.substring(2, 6);
                 ArrayList<Double> rssiList;
 
-                if (sosRssi.containsKey(key))
+                if (sosRssi.containsKey(key)) {
                     rssiList = (ArrayList<Double>) sosRssi.get(key);
-                else
+                    inputData = new HashMap<String, String>();
+                    inputData.put("data", "패킷데이터 : " + advData);
+                    inputData.put("distance", "<조난신호>     " + "rssi : " + String.valueOf(rssi) + "                  " + String.valueOf(rssiList.size())  + "  / 20");
+                }
+                else {
                     rssiList = new ArrayList<>();
+                    inputData = new HashMap<String, String>();
+                    inputData.put("data", "패킷데이터 : " + advData);
+                    inputData.put("distance", "<조난신호>     " + "rssi : " + String.valueOf(rssi) + "                  " + " 1 / 20");
+                }
                 if (rssiList.size() < 20) {
                     rssiList.add((double) rssi);
                     sosRssi.put(key, rssiList);
@@ -246,9 +248,6 @@ public class Scan1 extends AppCompatActivity {
                     sosDistance.put(key, getDistance(1.55, -56, kalman(rssiList, 50.0, 0.008)));
                     sosData.put(key, advData);
                 }
-
-                testView.setText("RSSI 개수 : " + String.valueOf(rssiList.size()));
-                progress_bar(rssiList.size()*5);
 
             } else {
                 if(isSOS.contains("n")){
@@ -412,7 +411,7 @@ public class Scan1 extends AppCompatActivity {
     }
 
 
-    public void progress_bar(int value){
+    /*public void progress_bar(int value){
         try {
 
             // 변환된 값을 프로그레스바에 적용.
@@ -426,7 +425,7 @@ public class Scan1 extends AppCompatActivity {
             toast.show();
         }
 
-    }
+    }*/
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions,

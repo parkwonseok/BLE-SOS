@@ -183,7 +183,7 @@ public class Advertise2 extends AppCompatActivity {
 
         // Advertising 신호 주기, 세기 설정
         bleAdvertiseSettings = new AdvertiseSettings.Builder()
-                .setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_BALANCED)   // 신호 주기 설정
+                .setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_LOW_LATENCY)   // 신호 주기 설정
                 // ADVERTISE_MODE_LOW_POWER : 1초에 1번
                 // ADVERTISE_MODE_BALANCED : 1초에 3번
                 // ADVERTISE_MODE_LOW_LATENCY : 1초에 10번
