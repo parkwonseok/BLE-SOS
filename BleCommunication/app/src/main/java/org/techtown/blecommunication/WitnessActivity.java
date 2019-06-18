@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.location.Location;
@@ -54,23 +55,28 @@ public class WitnessActivity extends AppCompatActivity {
     double longitude;
     double latitude;
     int counter;
+    int fire_id;
 
     private DatabaseReference mFirebaseDatabase;
     private FirebaseDatabase mFirebaseInstance;
-    private int fire_id;
+    private DatabaseReference counterRef;
+
 
     private DbOpenHelper mDbOpenHelper; //내부 DB 관리
     private Cursor mCursor; // DB 관련
     private UserInfo mUserInfo;
     String TAG = "database";
 
-    final LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
     @Override
     protected void onStart() {
         super.onStart();
+
+        final LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
         mFirebaseInstance = FirebaseDatabase.getInstance();
+        //referencce 초기 설정("DataUsers/")
         mFirebaseDatabase = mFirebaseInstance.getReference("DataUsers");
-        DatabaseReference counterRef = mFirebaseDatabase.child("Witness").child("counter");
+        counterRef = mFirebaseDatabase.child("Witness").child("counter");
         counterRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -119,7 +125,6 @@ public class WitnessActivity extends AppCompatActivity {
 
         editContent = findViewById(R.id.edit_content);
         submitBtn = findViewById(R.id.submitBtn);
-        locationBtn = findViewById(R.id.locationBtn);
         locationTv = findViewById(R.id.locationTv);
 
         mFirebaseInstance = FirebaseDatabase.getInstance();
@@ -166,7 +171,10 @@ public class WitnessActivity extends AppCompatActivity {
 
 
                 content = editContent.getText().toString();
-                addWitness(counter, time, content, longitude, latitude);
+                addWitness(fire_id, time, content, longitude, latitude);
+                Toast.makeText(getApplicationContext(), "제보가 완료되었습니다.", Toast.LENGTH_LONG).show();
+                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                startActivity(intent);
 
             }
         });
@@ -212,8 +220,6 @@ public class WitnessActivity extends AppCompatActivity {
             locationTv.setText("위치정보 : " + provider + "\n" +
                     "위도 : " + longitude + "\n" +
                     "경도 : " + latitude + "\n" );
-
-
         }
 
         public void onStatusChanged(String provider, int status, Bundle extras) {
