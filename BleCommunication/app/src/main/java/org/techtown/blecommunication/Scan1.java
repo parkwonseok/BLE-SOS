@@ -307,7 +307,7 @@ public class Scan1 extends AppCompatActivity {
                     rssiList.add((double) rssi);
                     sosRssi.put(key, rssiList);
                 } else if (rssiList.size() == 20) {
-                    sosDistance.put(key, getDistance(1.55, -56, kalman(rssiList, 50.0, 0.008)))
+                    sosDistance.put(key, getDistance(1.55, -56, kalman(rssiList, 50.0, 0.008)));
                     sosData.put(key, advData);
                 }
 
