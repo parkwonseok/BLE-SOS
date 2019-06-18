@@ -51,7 +51,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 
-public class map_findActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnInfoWindowClickListener {
+public class map_findActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnInfoWindowClickListener, GoogleMap.OnMarkerClickListener {
 
     private static final String TAG = "TAG내용";
     private static final int GPS_ENABLE_REQUEST_CODE = 2001;
@@ -72,7 +72,6 @@ public class map_findActivity extends FragmentActivity implements OnMapReadyCall
 
     // 앱을 실행하기 위해 필요한 퍼미션을 정의
     String[] REQUIRED_PERMISSIONS  = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};  // 외부 저장소
-
     Location mCurrentLocatiion;
     LatLng currentPosition;
 
@@ -281,6 +280,7 @@ public class map_findActivity extends FragmentActivity implements OnMapReadyCall
 
         mMap.getUiSettings().setMyLocationButtonEnabled(true);
         mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
+        mMap.setOnMarkerClickListener(this);
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
 
             @Override
@@ -665,34 +665,21 @@ public class map_findActivity extends FragmentActivity implements OnMapReadyCall
         String num;
         String time;
         String sick;
-        if(android.os.Build.VERSION.SDK_INT >= 26) {
-            String data = p1.sosData;
-            id = data.substring(0, 4);
-            num = data.substring(4, 5);
-//            time = data.substring(5, 16);
-            time = "123";
-//            sick = data.substring(16, 17);
-            sick = "123123";
-//            batLen = data.substring(17).split(",");
-            battery = "123";
-//            battery = batLen[0];
+        String data = p1.sosData;
+        id = data.substring(2, 6);
+        num = data.substring(6, 7);
+        time = data.substring(7, 18);
+        sick = data.substring(18, 19);
+        batLe = data.substring(19);
+        Log.d("data", data);
+        if (batLe.length() == 2) {
+            battery = batLe.substring(0, 1);
+        } else if (batLe.length() == 3) {
+            battery = batLe.substring(0, 2);
+        } else {
+            battery = "100";
         }
-        else {
-            String data = p1.sosData;
-            id = data.substring(0, 4);
-            num = data.substring(4, 5);
-            time = data.substring(5, 16);
-            sick = data.substring(16, 17);
-            batLe = data.substring(17);
-            Log.d("data", data);
-            if (batLe.length() == 2) {
-                battery = batLe.substring(0, 1);
-            } else if (batLe.length() == 3) {
-                battery = batLe.substring(0, 2);
-            } else {
-                battery = "100";
-            }
-        }
+
         scanData.append("   -  회원 ID : " + id);
         scanData.append("\n   -  조난인원 : " + num);
         scanData.append("\n   -  조난일시 : " + time);
@@ -730,6 +717,9 @@ public class map_findActivity extends FragmentActivity implements OnMapReadyCall
                 .title("조난자 정보")// 타이틀.
                 .snippet(scanData.toString())
                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.sos));
+        CustomInfoWindowGoogleMap customInfoWindow = new CustomInfoWindowGoogleMap(this);
+        mMap.setInfoWindowAdapter(customInfoWindow);
+
         mMap.addMarker(makerOptions);
 
         Random randomGenerator = new Random(); // Construct a new Random number generator
@@ -769,4 +759,34 @@ public class map_findActivity extends FragmentActivity implements OnMapReadyCall
         Toast.makeText(this, "Info window clicked",
                 Toast.LENGTH_SHORT).show();
     }
+
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        CameraUpdate center = CameraUpdateFactory.newLatLng(marker.getPosition());
+        mMap.animateCamera(center);
+
+        changeSelectedMarker(marker);
+
+
+        return false;
+    }
+
+    private void changeSelectedMarker(Marker marker) {
+        // 선택했던 마커 되돌리기
+        if (currentMarker != null) {
+
+//            addMarker(selectedMarker, false);
+//            selectedMarker.remove();
+        }
+
+        // 선택한 마커 표시
+        if (marker != null) {
+
+//            selectedMarker = addMarker(marker, true);
+//            marker.remove();
+        }
+
+
+    }
+
 }
