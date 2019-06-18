@@ -91,6 +91,7 @@ public class GpsInfo extends Service implements LocationListener {
                             // 위도 경도 저장
                             lat = location.getLatitude();
                             lon = location.getLongitude();
+                            Log.d("실행중", "GPSInfo 에서 " + lat + lon);
                         }
                     }
                 }

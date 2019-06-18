@@ -106,6 +106,7 @@ public class Scan1 extends AppCompatActivity {
 
 
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -133,7 +134,6 @@ public class Scan1 extends AppCompatActivity {
 
         gps = new GpsInfo(Scan1.this);
         gps.getLocation();
-        Log.d("123123",  "123123");
 
 
         // Scan 시작
@@ -219,6 +219,7 @@ public class Scan1 extends AppCompatActivity {
             int rssi = result.getRssi();
             int listDeviceSize = listDevice.size();
             String advData = result.getScanRecord().getDeviceName();
+            Log.d("result", result.getScanRecord().toString());
 
             if (advData != null) {
                 isSOS = advData.substring(0, 2);
@@ -250,9 +251,17 @@ public class Scan1 extends AppCompatActivity {
                 progress_bar(rssiList.size()*5);
 
             } else {
-                inputData = new HashMap<String, String>();
-                inputData.put("data", "패킷데이터 : " + advData);
-                inputData.put("distance", "<알 수 없는 신호>     " + "rssi : " + String.valueOf(rssi));
+                if(isSOS.contains("n")){
+//                    inputData = new HashMap<String, String>();
+//                    inputData.put("data", "패킷데이터 : " + advData);
+//                    inputData.put("distance", "<알 수 없는 신호>     " + "rssi : " + String.valueOf(rssi));
+                }
+                else{
+                    inputData = new HashMap<String, String>();
+                    inputData.put("data", "패킷데이터 : " + advData);
+                    inputData.put("distance", "<알 수 없는 신호>     " + "rssi : " + String.valueOf(rssi));
+                }
+
             }
 
             for (int i = 0; i < listDeviceSize; i++) {
@@ -265,12 +274,23 @@ public class Scan1 extends AppCompatActivity {
                 }
             }
             if (check == 0) {
-                if (inputData.get("data").equals("null")) {
+                try{
+                    if (inputData.get("data").equals("null")) {
 
-                } else {
-                    bleDevices.add(result.getDevice());
-                    listDevice.add(inputData);
+                    } else {
+                        bleDevices.add(result.getDevice());
+                        listDevice.add(inputData);
+                    }
                 }
+                catch (NullPointerException e){
+                    e.printStackTrace();
+                }
+//                if (inputData.get("data").equals("null")) {
+//
+//                } else {
+//                    bleDevices.add(result.getDevice());
+//                    listDevice.add(inputData);
+//                }
             }
             check = 0;
             // 리스트뷰 갱신
