@@ -64,6 +64,8 @@ public class Scan1 extends AppCompatActivity {
     // Map < 조난자id, 거리 >
     HashMap<String, Double> sosDistance = new HashMap<>();
 
+
+
     int check = 0;
     String isSOS;
 
@@ -152,6 +154,7 @@ public class Scan1 extends AppCompatActivity {
                 String scanData = listDevice.get(position).toString();
                 ScanInfo scanInfo = new ScanInfo(scanData);
                 intent.putExtra("scan", scanInfo);
+                stopScaning();
                 startActivityForResult(intent, REQUEST_SCAN2_ACTIVITY);
             }
         });
@@ -166,8 +169,9 @@ public class Scan1 extends AppCompatActivity {
                 for (String key : sosDistance.keySet()) {
                     latitude = gps.getLatitude();
                     longitude = gps.getLongitude();
-                    addSOSList(Integer.parseInt(key), sosDistance.get(key), latitude, longitude, sosData.get(key));
+                    addSOSList(key, sosDistance.get(key), latitude, longitude, sosData.get(key));
                 }
+                Toast.makeText(getApplicationContext(), "서버 DB로 전송되었습니다.", Toast.LENGTH_SHORT).show();
 
             }
         });
@@ -217,7 +221,7 @@ public class Scan1 extends AppCompatActivity {
             int rssi = result.getRssi();
             int listDeviceSize = listDevice.size();
             String advData = result.getScanRecord().getDeviceName();
-            Log.d("result", result.getScanRecord().toString());
+//            Log.d("result", result.getScanRecord().toString());
 
             if (advData != null) {
                 isSOS = advData.substring(0, 2);
@@ -233,13 +237,13 @@ public class Scan1 extends AppCompatActivity {
                     rssiList = (ArrayList<Double>) sosRssi.get(key);
                     inputData = new HashMap<String, String>();
                     inputData.put("data", "패킷데이터 : " + advData);
-                    inputData.put("distance", "<조난신호>     " + "rssi : " + String.valueOf(rssi) + "                  " + String.valueOf(rssiList.size())  + "  / 20");
+                    inputData.put("distance", "<조난신호>     " + "rssi : " + String.valueOf(rssi) + "                     " + String.valueOf(rssiList.size())  + "  / 20");
                 }
                 else {
                     rssiList = new ArrayList<>();
                     inputData = new HashMap<String, String>();
                     inputData.put("data", "패킷데이터 : " + advData);
-                    inputData.put("distance", "<조난신호>     " + "rssi : " + String.valueOf(rssi) + "                  " + " 1 / 20");
+                    inputData.put("distance", "<조난신호>     " + "rssi : " + String.valueOf(rssi) + "                     " + " 1 / 20");
                 }
                 if (rssiList.size() < 20) {
                     rssiList.add((double) rssi);
@@ -249,17 +253,81 @@ public class Scan1 extends AppCompatActivity {
                     sosData.put(key, advData);
                 }
 
-            } else {
-                if(isSOS.contains("n")){
-//                    inputData = new HashMap<String, String>();
-//                    inputData.put("data", "패킷데이터 : " + advData);
-//                    inputData.put("distance", "<알 수 없는 신호>     " + "rssi : " + String.valueOf(rssi));
-                }
-                else{
+            }else if(isSOS.contains("N")){
+                String key = advData.substring(2, 6);
+                ArrayList<Double> rssiList;
+
+                if (sosRssi.containsKey(key)) {
+                    rssiList = (ArrayList<Double>) sosRssi.get(key);
                     inputData = new HashMap<String, String>();
                     inputData.put("data", "패킷데이터 : " + advData);
-                    inputData.put("distance", "<알 수 없는 신호>     " + "rssi : " + String.valueOf(rssi));
+                    inputData.put("distance", "<라즈베리파이 노드>     " + "rssi : " + String.valueOf(rssi) + "           " + String.valueOf(rssiList.size())  + "  / 20");
                 }
+                else {
+                    rssiList = new ArrayList<>();
+                    inputData = new HashMap<String, String>();
+                    inputData.put("data", "패킷데이터 : " + advData);
+                    inputData.put("distance", "<라즈베리파이 노드>     " + "rssi : " + String.valueOf(rssi) + "           " + " 1 / 20");
+                }
+                if (rssiList.size() < 20) {
+                    rssiList.add((double) rssi);
+                    sosRssi.put(key, rssiList);
+                } else if (rssiList.size() == 20) {
+                    sosDistance.put(key, getDistance(1.55, -56, kalman(rssiList, 50.0, 0.008)));
+                    sosData.put(key, advData);
+                }
+            }else if(isSOS.contains("R")){
+                String key = advData.substring(2, 6);
+                ArrayList<Double> rssiList;
+
+                if (sosRssi.containsKey(key)) {
+                    rssiList = (ArrayList<Double>) sosRssi.get(key);
+                    inputData = new HashMap<String, String>();
+                    inputData.put("data", "패킷데이터 : " + advData);
+                    inputData.put("distance", "<라즈베리파이 응답>     " + "rssi : " + String.valueOf(rssi) + "           " + String.valueOf(rssiList.size())  + "  / 20");
+                }
+                else {
+                    rssiList = new ArrayList<>();
+                    inputData = new HashMap<String, String>();
+                    inputData.put("data", "패킷데이터 : " + advData);
+                    inputData.put("distance", "<라즈베리파이 응답>     " + "rssi : " + String.valueOf(rssi) + "           " + " 1 / 20");
+                }
+                if (rssiList.size() < 20) {
+                    rssiList.add((double) rssi);
+                    sosRssi.put(key, rssiList);
+                } else if (rssiList.size() == 20) {
+                    sosDistance.put(key, getDistance(1.55, -56, kalman(rssiList, 50.0, 0.008)));
+                    sosData.put(key, advData);
+                }
+            }
+            else {
+                if(advData == null) {
+
+                }
+                else {
+                    String key = advData;
+                    ArrayList<Double> rssiList;
+
+                    if (sosRssi.containsKey(key)) {
+                        rssiList = (ArrayList<Double>) sosRssi.get(key);
+                        inputData = new HashMap<String, String>();
+                        inputData.put("data", "장치 이름 : " + advData);
+                        inputData.put("distance", "<알 수 없는 장치>     " + "rssi : " + String.valueOf(rssi) + "           " + String.valueOf(rssiList.size()) + "  / 20");
+                    } else {
+                        rssiList = new ArrayList<>();
+                        inputData = new HashMap<String, String>();
+                        inputData.put("data", "장치 이름 : " + advData);
+                        inputData.put("distance", "<알 수 없는 장치>     " + "rssi : " + String.valueOf(rssi) + "           " + " 1 / 20");
+                    }
+                    if (rssiList.size() < 20) {
+                        rssiList.add((double) rssi);
+                        sosRssi.put(key, rssiList);
+                    } else if (rssiList.size() == 20) {
+                        sosDistance.put(key, getDistance(1.55, -56, kalman(rssiList, 50.0, 0.008)));
+                        sosData.put(key, advData);
+                    }
+                }
+
 
             }
 
@@ -282,7 +350,7 @@ public class Scan1 extends AppCompatActivity {
                     }
                 }
                 catch (NullPointerException e){
-                    e.printStackTrace();
+//                    e.printStackTrace();
                 }
 //                if (inputData.get("data").equals("null")) {
 //
@@ -302,16 +370,16 @@ public class Scan1 extends AppCompatActivity {
             @Override
             public void run() {
                 mScanSettings = new ScanSettings.Builder();
-                mScanSettings.setScanMode(ScanSettings.SCAN_MODE_BALANCED);
+                mScanSettings.setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY);
                 ScanSettings scanSettings = mScanSettings.build();
 
                 scanFilters = new Vector<>();
                 ScanFilter.Builder scanFilter = new ScanFilter.Builder();
-                scanFilter.setServiceUuid(ParcelUuid.fromString("CDB7950D-73F1-4D4D-8E47-C090502DBD63"));
+                //scanFilter.setServiceUuid(ParcelUuid.fromString("CDB7950D-73F1-4D4D-8E47-C090502DBD63"));
                 ScanFilter scan = scanFilter.build();
                 scanFilters.add(scan);
-                //bleScanner.startScan(scanFilters, scanSettings, bleScanCallback);
-                bleScanner.startScan(bleScanCallback);
+                bleScanner.startScan(scanFilters, scanSettings, bleScanCallback);
+                //bleScanner.startScan(bleScanCallback);
             }
         });
     }
@@ -391,7 +459,7 @@ public class Scan1 extends AppCompatActivity {
         return sum1;
     }
 
-    public void addSOSList(int SOS_id, double distance, double latitude, double longitude, String sosData) {
+    public void addSOSList(String SOS_id, double distance, double latitude, double longitude, String sosData) {
         mDbOpenHelper = new DbOpenHelper(this);
         mDbOpenHelper.open();
         mCursor = null;
@@ -401,13 +469,13 @@ public class Scan1 extends AppCompatActivity {
         fire_id = mCursor.getInt(mCursor.getColumnIndex("fire_id"));
         Log.d("data_value", fire_id + "/" + distance + "/" + latitude + "/" + longitude);
 
-        mFirebaseDatabase.child("sos_info").child(String.valueOf(SOS_id)).child(String.valueOf(fire_id)).child("distance").setValue(distance);
+        mFirebaseDatabase.child("sos_info").child(SOS_id).child(String.valueOf(fire_id)).child("distance").setValue(distance);
 
-        mFirebaseDatabase.child("sos_info").child(String.valueOf(SOS_id)).child(String.valueOf(fire_id)).child("latitude").setValue(latitude);
+        mFirebaseDatabase.child("sos_info").child(SOS_id).child(String.valueOf(fire_id)).child("latitude").setValue(latitude);
 
-        mFirebaseDatabase.child("sos_info").child(String.valueOf(SOS_id)).child(String.valueOf(fire_id)).child("longitude").setValue(longitude);
+        mFirebaseDatabase.child("sos_info").child(SOS_id).child(String.valueOf(fire_id)).child("longitude").setValue(longitude);
 
-        mFirebaseDatabase.child("sos_info").child(String.valueOf(SOS_id)).child(String.valueOf(fire_id)).child("sos_content").setValue(sosData);
+        mFirebaseDatabase.child("sos_info").child(SOS_id).child(String.valueOf(fire_id)).child("sos_content").setValue(sosData);
     }
 
 

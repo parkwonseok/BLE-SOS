@@ -6,7 +6,7 @@ public class SOSInfo {
     //구조자 id
     public int helper_id;
     //조난자 id
-    public int sos_id;
+    public String sos_id;
     //조난자와 구조자 거리
     public double distance;
     //경도
@@ -16,7 +16,7 @@ public class SOSInfo {
 
     public String sosData;
 
-    SOSInfo(int helper_id, int sos_id, double distance, double longitude, double latitude, String sosData){
+    SOSInfo(int helper_id, String sos_id, double distance, double longitude, double latitude, String sosData){
         this.helper_id = helper_id;
         this.sos_id = sos_id;
         this.distance = distance;
@@ -26,7 +26,7 @@ public class SOSInfo {
         Log.d("블루투스로 확인된 내용", "구조자 블루투스 검색 목록 추가 완료");
     }
 
-    SOSInfo(int sos_id, double longitude, double latitude){
+    SOSInfo(String sos_id, double longitude, double latitude){
         this.sos_id = sos_id;
         this.longitude = longitude;
         this.latitude = latitude;
@@ -41,16 +41,16 @@ public class SOSInfo {
         this.helper_id = helper_id;
     }
 
-    public int getSos_id() {
+    public String getSos_id() {
         return sos_id;
     }
 
-    public void setSos_id(int sos_id) {
+    public void setSos_id(String sos_id) {
         this.sos_id = sos_id;
     }
 
     public double getDistance() {
-        return distance/1000;
+        return (distance+2)/1000;
     }
 
     public void setDistance(double distance) {

@@ -71,7 +71,7 @@ public class map_findActivity extends FragmentActivity implements OnMapReadyCall
     private View mLayout;
 
     // 앱을 실행하기 위해 필요한 퍼미션을 정의
-    String[] REQUIRED_PERMISSIONS  = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};  // 외부 저장소
+    String[] REQUIRED_PERMISSIONS = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};  // 외부 저장소
     Location mCurrentLocatiion;
     LatLng currentPosition;
 
@@ -83,7 +83,7 @@ public class map_findActivity extends FragmentActivity implements OnMapReadyCall
 
     //삼각측량의 위한 변수들
     int helper_id;
-    int sos_id;
+    String sos_id;
     double distance;
     double longitude;
     double latitude;
@@ -137,8 +137,8 @@ public class map_findActivity extends FragmentActivity implements OnMapReadyCall
         find_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                for(SOSInfo sosinfo : sosInfos){
-                    Log.d("배열에 저장된값들: ", ""+sosinfo.helper_id+sosinfo.sos_id);
+                for (SOSInfo sosinfo : sosInfos) {
+                    Log.d("배열에 저장된값들: ", "" + sosinfo.helper_id + sosinfo.sos_id);
                 }
                 mMap.clear();
                 find_sos(sosInfos);
@@ -146,7 +146,7 @@ public class map_findActivity extends FragmentActivity implements OnMapReadyCall
         });
     }
 
-    LocationCallback locationCallback = new LocationCallback(){
+    LocationCallback locationCallback = new LocationCallback() {
         @Override
         public void onLocationResult(LocationResult locationResult) {
             super.onLocationResult(locationResult);
@@ -186,7 +186,7 @@ public class map_findActivity extends FragmentActivity implements OnMapReadyCall
 
             Log.d(TAG, "startLocationUpdates : call showDialogForLocationServiceSetting");
             showDialogForLocationServiceSetting();
-        }else {
+        } else {
 
             int hasFineLocationPermission = ContextCompat.checkSelfPermission(this,
                     Manifest.permission.ACCESS_FINE_LOCATION);
@@ -194,9 +194,8 @@ public class map_findActivity extends FragmentActivity implements OnMapReadyCall
                     Manifest.permission.ACCESS_COARSE_LOCATION);
 
 
-
             if (hasFineLocationPermission != PackageManager.PERMISSION_GRANTED ||
-                    hasCoarseLocationPermission != PackageManager.PERMISSION_GRANTED   ) {
+                    hasCoarseLocationPermission != PackageManager.PERMISSION_GRANTED) {
 
                 Log.d(TAG, "startLocationUpdates : 퍼미션 안가지고 있음");
                 return;
@@ -213,7 +212,6 @@ public class map_findActivity extends FragmentActivity implements OnMapReadyCall
         }
 
     }
-
 
 
     /**
@@ -243,12 +241,12 @@ public class map_findActivity extends FragmentActivity implements OnMapReadyCall
                 Manifest.permission.ACCESS_COARSE_LOCATION);
 
         if (hasFineLocationPermission == PackageManager.PERMISSION_GRANTED &&
-                hasCoarseLocationPermission == PackageManager.PERMISSION_GRANTED   ) {
+                hasCoarseLocationPermission == PackageManager.PERMISSION_GRANTED) {
 
             // 2. 이미 퍼미션을 가지고 있다면
             startLocationUpdates(); // 3. 위치 업데이트 시작
 
-        }else {  //2. 퍼미션 요청을 허용한 적이 없다면 퍼미션 요청이 필요. 2가지 경우(3-1, 4-1)
+        } else {  //2. 퍼미션 요청을 허용한 적이 없다면 퍼미션 요청이 필요. 2가지 경우(3-1, 4-1)
 
             // 3-1. 사용자가 퍼미션 거부를 한 적이 있는 경우에는
             if (ActivityCompat.shouldShowRequestPermissionRationale(this, REQUIRED_PERMISSIONS[0])) {
@@ -261,7 +259,7 @@ public class map_findActivity extends FragmentActivity implements OnMapReadyCall
                     public void onClick(View view) {
 
                         // 3-3. 사용자게에 퍼미션 요청을 합니다. 요청 결과는 onRequestPermissionResult에서 수신
-                        ActivityCompat.requestPermissions( map_findActivity.this, REQUIRED_PERMISSIONS,
+                        ActivityCompat.requestPermissions(map_findActivity.this, REQUIRED_PERMISSIONS,
                                 PERMISSIONS_REQUEST_CODE);
                     }
                 }).show();
@@ -270,12 +268,11 @@ public class map_findActivity extends FragmentActivity implements OnMapReadyCall
             } else {
                 // 4-1. 사용자가 퍼미션 거부를 한 적이 없는 경우에는 퍼미션 요청을 바로 합니다.
                 // 요청 결과는 onRequestPermissionResult에서 수신됩니다.
-                ActivityCompat.requestPermissions( this, REQUIRED_PERMISSIONS,
+                ActivityCompat.requestPermissions(this, REQUIRED_PERMISSIONS,
                         PERMISSIONS_REQUEST_CODE);
             }
 
         }
-
 
 
         mMap.getUiSettings().setMyLocationButtonEnabled(true);
@@ -286,7 +283,7 @@ public class map_findActivity extends FragmentActivity implements OnMapReadyCall
             @Override
             public void onMapClick(LatLng latLng) {
 
-                Log.d( TAG, "onMapClick :");
+                Log.d(TAG, "onMapClick :");
             }
         });
     }
@@ -302,7 +299,7 @@ public class map_findActivity extends FragmentActivity implements OnMapReadyCall
             Log.d(TAG, "onStart : call mFusedLocationClient.requestLocationUpdates");
             mFusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null);
 
-            if (mMap!=null)
+            if (mMap != null)
                 mMap.setMyLocationEnabled(true);
 
         }
@@ -321,8 +318,6 @@ public class map_findActivity extends FragmentActivity implements OnMapReadyCall
             mFusedLocationClient.removeLocationUpdates(locationCallback);
         }
     }
-
-
 
 
     public String getCurrentAddress(LatLng latlng) {
@@ -433,9 +428,8 @@ public class map_findActivity extends FragmentActivity implements OnMapReadyCall
                 Manifest.permission.ACCESS_COARSE_LOCATION);
 
 
-
         if (hasFineLocationPermission == PackageManager.PERMISSION_GRANTED &&
-                hasCoarseLocationPermission == PackageManager.PERMISSION_GRANTED   ) {
+                hasCoarseLocationPermission == PackageManager.PERMISSION_GRANTED) {
             return true;
         }
 
@@ -444,13 +438,11 @@ public class map_findActivity extends FragmentActivity implements OnMapReadyCall
     }
 
 
-
-
     public void onRequestPermissionsResult(int permsRequestCode,
                                            @NonNull String[] permissions,
                                            @NonNull int[] grandResults) {
 
-        if ( permsRequestCode == PERMISSIONS_REQUEST_CODE && grandResults.length == REQUIRED_PERMISSIONS.length) {
+        if (permsRequestCode == PERMISSIONS_REQUEST_CODE && grandResults.length == REQUIRED_PERMISSIONS.length) {
 
             // 요청 코드가 PERMISSIONS_REQUEST_CODE 이고, 요청한 퍼미션 개수만큼 수신되었다면
 
@@ -467,12 +459,11 @@ public class map_findActivity extends FragmentActivity implements OnMapReadyCall
             }
 
 
-            if ( check_result ) {
+            if (check_result) {
 
                 // 퍼미션을 허용했다면 위치 업데이트를 시작
                 startLocationUpdates();
-            }
-            else {
+            } else {
                 // 거부한 퍼미션이 있다면 앱을 사용할 수 없는 이유를 설명해주고 앱을 종료.2 가지 경우
 
                 if (ActivityCompat.shouldShowRequestPermissionRationale(this, REQUIRED_PERMISSIONS[0])
@@ -490,7 +481,7 @@ public class map_findActivity extends FragmentActivity implements OnMapReadyCall
                         }
                     }).show();
 
-                }else {
+                } else {
 
 
                     // "다시 묻지 않음"을 사용자가 체크하고 거부를 선택한 경우에는 설정(앱 정보)에서 퍼미션을 허용해야 앱을 사용가능
@@ -560,7 +551,7 @@ public class map_findActivity extends FragmentActivity implements OnMapReadyCall
     }
 
 
-    public void sos_checking(){
+    public void sos_checking() {
 
         //firebase 연결
         mFirebaseInstance = FirebaseDatabase.getInstance();
@@ -576,7 +567,7 @@ public class map_findActivity extends FragmentActivity implements OnMapReadyCall
 
                 for (DataSnapshot sos : dataSnapshot.getChildren()) {
                     //sos_id
-                    sos_id = Integer.parseInt(sos.getKey());
+                    sos_id = sos.getKey();
                     Log.d("sos_id", sos.getKey());
                     get_helper_id(sos.getKey(), mSOSRef);
                     Log.d("count", String.valueOf(sos.getChildrenCount()));
@@ -594,22 +585,22 @@ public class map_findActivity extends FragmentActivity implements OnMapReadyCall
 
     }
 
-    public void get_helper_id(final String sos_id1, DatabaseReference Ref){
+    public void get_helper_id(final String sos_id1, DatabaseReference Ref) {
 
         DatabaseReference Helper_id_Ref = Ref.child(sos_id1);
         Helper_id_Ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for (DataSnapshot sos : dataSnapshot.getChildren()){
+                for (DataSnapshot sos : dataSnapshot.getChildren()) {
                     helper_id = Integer.parseInt(sos.getKey());
-                    Log.d("sos_id/helper_id", sos_id1 +"/"+sos.getKey());
+                    Log.d("sos_id/helper_id", sos_id1 + "/" + sos.getKey());
                     Log.d("해당하는 조난자 갯수", String.valueOf(sos.getChildrenCount()));
                     distance = sos.child("distance").getValue(double.class);
                     latitude = sos.child("latitude").getValue(double.class);
                     longitude = sos.child("longitude").getValue(double.class);
                     sosData = sos.child("sos_content").getValue(String.class);
-                    Log.d("values : ", "distanc:"+ distance+"latitude:"+latitude+"longitude"+longitude);
-                    sosInfo = new SOSInfo(helper_id, Integer.parseInt(sos_id1), distance, longitude, latitude, sosData);
+                    Log.d("values : ", "distance:" + distance + "latitude:" + latitude + "longitude" + longitude);
+                    sosInfo = new SOSInfo(helper_id, sos_id1, distance, longitude, latitude, sosData);
                     sosInfos.add(sosInfo);
                 }
             }
@@ -621,41 +612,47 @@ public class map_findActivity extends FragmentActivity implements OnMapReadyCall
         });
     }
 
-    public void find_sos(ArrayList<SOSInfo> sosInfos){
+    public void find_sos(ArrayList<SOSInfo> sosInfos) {
+        String id_sos;
         counter = 0;
-        int check_id = -1;
-        for(SOSInfo sosinfo: sosInfos){
-            //처음 시작부분
-            if(check_id == -1){
-                check_id = sosinfo.sos_id;
-                Log.d("check_id", check_id+"");
-                finder[counter] = sosinfo;
-                counter++;
-            }
-
-            else if(check_id == sosinfo.sos_id){
-                finder[counter] = sosinfo;
-                Log.d("check_id", check_id+"");
-                counter++;
+        String check_id = " ";
+        for (SOSInfo sosinfo : sosInfos) {
+            if(sosinfo.sosData.length()>6){
+                id_sos = sosinfo.sosData.substring(0,6);
             }
             else{
-                Log.d("check_id", check_id+"");
+                id_sos = sosinfo.sosData;
+            }
+            //처음 시작부분
+            if (check_id.equals(" ")) {
+                check_id = id_sos;
+                Log.d("check_id", check_id + "");
+                finder[counter] = sosinfo;
+                counter++;
+            } else if (check_id.equals(id_sos)) {
+                finder[counter] = sosinfo;
+                Log.d("check_id", check_id + "");
+                counter++;
+            } else {
+                Log.d("check_id", check_id + "");
                 counter = 1;
-                check_id = sosinfo.sos_id;
+                check_id = id_sos;
                 finder[0] = sosinfo;
             }
-            if(counter==3){
-                Log.d("finder[0~2]",finder[0].helper_id+"/"+finder[1].helper_id+"/"+finder[2].helper_id);
-                MarkerOptions makerOptions = new MarkerOptions();
-                Compute(finder[0],finder[1],finder[2]);
-                check_id = -1;
-                counter =0;
+            if (counter == 3) {
+                    Log.d("finder[0~2]", finder[0].helper_id + "/" + finder[1].helper_id + "/" + finder[2].helper_id);
+                    MarkerOptions makerOptions = new MarkerOptions();
+                    Compute(finder[0], finder[1], finder[2]);
+                    check_id = " ";
+                    counter = 0;
+                }
+
             }
         }
-    }
 
-    public void Compute(SOSInfo p1, SOSInfo p2, SOSInfo p3){
-        double sum = p1.distance+p2.distance+p3.distance;
+
+    public void Compute(SOSInfo p1, SOSInfo p2, SOSInfo p3) {
+        double sum = p1.distance + p2.distance + p3.distance;
         double[] i = new double[2];
         StringBuilder scanData = new StringBuilder();
         String batLe;
@@ -666,57 +663,63 @@ public class map_findActivity extends FragmentActivity implements OnMapReadyCall
         String time;
         String sick;
         String data = p1.sosData;
-        id = data.substring(2, 6);
-        num = data.substring(6, 7);
-        time = data.substring(7, 18);
-        sick = data.substring(18, 19);
-        batLe = data.substring(19);
-        Log.d("data", data);
-        if (batLe.length() == 2) {
-            battery = batLe.substring(0, 1);
-        } else if (batLe.length() == 3) {
-            battery = batLe.substring(0, 2);
-        } else {
-            battery = "100";
-        }
-
-        scanData.append("   -  회원 ID : " + id);
-        scanData.append("\n   -  조난인원 : " + num);
-        scanData.append("\n   -  조난일시 : " + time);
-        if(sick.equals("0")){
-            scanData.append("\n   -  현재상태 : 이상 없음");
-        }
-        else if(sick.equals("1")){
-            scanData.append("\n   -  현재상태 : 골절");
-        }
-        else if(sick.equals("2")){
-            scanData.append("\n   -  현재상태 : 출혈");
-        }
-        else if(sick.equals("3")){
-            scanData.append("\n   -  현재상태 : 골절, 출혈");
-        }
-        else if(sick.equals("4")){
-            scanData.append("\n   -  현재상태 : 염좌(삠)");
-        }
-        else if(sick.equals("5")){
-            scanData.append("\n   -  현재상태 : 골절, 염좌(삠)");
-        }
-        else if(sick.equals("6")){
-            scanData.append("\n   -  현재상태 : 출혈, 염좌(삠)");
-        }
-        else if(sick.equals("7")){
-            scanData.append("\n   -  현재상태 : 골절, 출혈, 염좌(삠)");
-        }
-        scanData.append("\n   -  배터리 : " + battery + " %");
-        i[0]= (p1.latitude*((p2.distance+p3.distance)/sum) + p2.latitude*((p1.distance+p3.distance)/sum) + p3.latitude*((p1.distance+p2.distance)/sum))/2;
-        i[1]= (p1.longitude*((p2.distance+p3.distance)/sum) + p2.longitude*((p1.distance+p3.distance)/sum) + p3.longitude*((p1.distance+p2.distance)/sum))/2;
+        i[0] = (p1.latitude * ((p2.distance + p3.distance) / sum) + p2.latitude * ((p1.distance + p3.distance) / sum) + p3.latitude * ((p1.distance + p2.distance) / sum)) / 2;
+        i[1] = (p1.longitude * ((p2.distance + p3.distance) / sum) + p2.longitude * ((p1.distance + p3.distance) / sum) + p3.longitude * ((p1.distance + p2.distance) / sum)) / 2;
         Log.d("data value", "lat" + i[0] + "long" + i[1]);
+
+
+
         MarkerOptions makerOptions = new MarkerOptions();
-        makerOptions // LatLng에 대한 어레이를 만들어서 이용할 수도 있다.
-                .position(new LatLng(i[0], i[1]))
-                .title("조난자 정보")// 타이틀.
-                .snippet(scanData.toString())
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.sos));
+        if(p1.sosData.contains("ID")){
+            id = data.substring(2, 6);
+            num = data.substring(6, 7);
+            time = data.substring(7, 18);
+            sick = data.substring(18, 19);
+            battery = data.substring(19);
+            Log.d("data", data);
+//            if (batLe.length() == 2) {
+//                battery = batLe.substring(0, 1);
+//            } else if (batLe.length() == 3) {
+//                battery = batLe.substring(0, 2);
+//            } else {
+//                battery = "100";
+//            }
+
+            scanData.append("   -  회원 ID : " + id);
+            scanData.append("\n   -  조난인원 : " + num);
+            scanData.append("\n   -  조난일시 : " + time);
+            if (sick.equals("0")) {
+                scanData.append("\n   -  현재상태 : 이상 없음");
+            } else if (sick.equals("1")) {
+                scanData.append("\n   -  현재상태 : 골절");
+            } else if (sick.equals("2")) {
+                scanData.append("\n   -  현재상태 : 출혈");
+            } else if (sick.equals("3")) {
+                scanData.append("\n   -  현재상태 : 골절, 출혈");
+            } else if (sick.equals("4")) {
+                scanData.append("\n   -  현재상태 : 염좌(삠)");
+            } else if (sick.equals("5")) {
+                scanData.append("\n   -  현재상태 : 골절, 염좌(삠)");
+            } else if (sick.equals("6")) {
+                scanData.append("\n   -  현재상태 : 출혈, 염좌(삠)");
+            } else if (sick.equals("7")) {
+                scanData.append("\n   -  현재상태 : 골절, 출혈, 염좌(삠)");
+            }
+            scanData.append("\n   -  배터리 : " + battery + " %");
+
+            makerOptions // LatLng에 대한 어레이를 만들어서 이용할 수도 있다.
+                    .position(new LatLng(i[0], i[1]))
+                    .title("조난자 정보")// 타이틀.
+                    .snippet(scanData.toString())
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.sos));
+        }
+        else{
+            makerOptions // LatLng에 대한 어레이를 만들어서 이용할 수도 있다.
+                    .position(new LatLng(i[0], i[1]))
+                    .title("조난자 정보")// 타이틀.
+                    .snippet("알 수 없는 블루투스 기기입니다.\n 주변에 조난자가 있을 확률 높습니다.")
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.bluetooth));
+        }
         CustomInfoWindowGoogleMap customInfoWindow = new CustomInfoWindowGoogleMap(this);
         mMap.setInfoWindowAdapter(customInfoWindow);
 
@@ -733,17 +736,18 @@ public class map_findActivity extends FragmentActivity implements OnMapReadyCall
 
     }
 
-    public void addHelper_marker(SOSInfo p){
+    public void addHelper_marker(SOSInfo p) {
 
         mMap.addCircle(new CircleOptions()
                 .center(new LatLng(p.getLatitude(), p.getLongitude()))
-                .radius(p.getDistance()*2000)
+                .radius(p.getDistance() * 2000)
                 .strokeColor(Color.GREEN)
                 .strokeWidth(0)
                 .fillColor(getColorWithAlpha(colorAsInt, 0.7f))
                 .strokeColor(5)
         );
     }
+
     public static int getColorWithAlpha(int color, float ratio) {
         int newColor = 0;
         int alpha = Math.round(Color.alpha(color) * ratio);
@@ -789,4 +793,55 @@ public class map_findActivity extends FragmentActivity implements OnMapReadyCall
 
     }
 
+    // 지리 변환식이다
+    // WGS84 ellipsoid constants
+    private final double a = 6378137; // radius
+    private final double e = 8.1819190842622e-2;  // eccentricity
+
+    private final double asq = Math.pow(a, 2);
+    private final double esq = Math.pow(e, 2);
+
+    private double[] ecef2lla(double[] ecef) {
+        double x = ecef[0];
+        double y = ecef[1];
+        double z = ecef[2];
+
+        double b = Math.sqrt(asq * (1 - esq));
+        double bsq = Math.pow(b, 2);
+        double ep = Math.sqrt((asq - bsq) / bsq);
+        double p = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
+        double th = Math.atan2(a * z, b * p);
+
+        double lon = Math.atan2(y, x);
+        double lat = Math.atan2((z + Math.pow(ep, 2) * b * Math.pow(Math.sin(th), 3)), (p - esq * a * Math.pow(Math.cos(th), 3)));
+        double N = a / (Math.sqrt(1 - esq * Math.pow(Math.sin(lat), 2)));
+        double alt = p / Math.cos(lat) - N;
+
+        // mod lat to 0-2pi
+        lon = lon % (2 * Math.PI);
+
+        // correction for altitude near poles left out.
+
+        double[] ret = {lat, lon, alt};
+
+        return ret;
+    }
+
+
+    private double[] lla2ecef(double[] lla) {
+        double lat = lla[0];
+        double lon = lla[1];
+        double alt = lla[2];
+
+        double N = a / Math.sqrt(1 - esq * Math.pow(Math.sin(lat), 2));
+
+        double x = (N + alt) * Math.cos(lat) * Math.cos(lon);
+        double y = (N + alt) * Math.cos(lat) * Math.sin(lon);
+        double z = ((1 - esq) * N + alt) * Math.sin(lat);
+
+        double[] ret = {x, y, z};
+        return ret;
+
+
+    }
 }
