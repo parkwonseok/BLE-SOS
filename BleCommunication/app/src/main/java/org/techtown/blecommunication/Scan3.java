@@ -75,13 +75,14 @@ public class Scan3 extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 String string = String.valueOf(editMsg.getText());
+//                String string = "확인";
                 sendReceive2.write(string.getBytes());
                 textView.append("\t\t\t나 : " + string + "\n");
                 editMsg.setText("");
             }
         });
 
-        ClientClass clientClass = new ClientClass(btArray[0]);
+        ClientClass clientClass = new ClientClass(btArray[1]);
         clientClass.start();
     }
 

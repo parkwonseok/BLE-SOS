@@ -13,6 +13,7 @@ import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -68,6 +69,7 @@ public class Advertise3 extends AppCompatActivity {
         sendBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Log.d("씨발새끼", String.valueOf(editMsg.getText()));
                 String string = String.valueOf(editMsg.getText());
                 sendReceive.write(string.getBytes());
                 textView.append("\t\t\t나 : " + string + "\n");

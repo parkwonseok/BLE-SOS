@@ -641,7 +641,6 @@ public class map_findActivity extends FragmentActivity implements OnMapReadyCall
             }
             if (counter == 3) {
                     Log.d("finder[0~2]", finder[0].helper_id + "/" + finder[1].helper_id + "/" + finder[2].helper_id);
-                    MarkerOptions makerOptions = new MarkerOptions();
                     Compute(finder[0], finder[1], finder[2]);
                     check_id = " ";
                     counter = 0;
