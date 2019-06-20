@@ -9,13 +9,14 @@
 
     <TextView
         android:id="@+id/textView"
-        android:layout_width="319dp"
-        android:layout_height="199dp"
+        android:layout_width="325dp"
+        android:layout_height="248dp"
         android:layout_marginTop="20dp"
-        android:text="1. 구조대가 신호를 수신하면, 페어링 요청\n     을 확인 받습니다.\n2. 확인을 누르시면 자동으로 구조대와 채팅\n    창이 연결됩니다.\n\n[조난시 도움말]\n- 일몰시간 확인(기온 강하)\n- 몸상태 확인\n- 주변 상황 확인"
+        android:text="1. 구조대가 신호를 수신하면, 페어링 요청\n     을 확인 받습니다.\n2. 확인을 누르시면 자동으로 구조대와 채팅창이 연결됩니다.\n\n[조난시 도움말]\n- 일몰시간 확인(기온 강하)\n- 몸상태 확인\n- 주변 상황 확인"
         android:textColor="@android:color/background_dark"
         android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.492"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imageView4" />
 
