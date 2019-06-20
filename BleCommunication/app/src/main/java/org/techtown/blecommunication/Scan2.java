@@ -18,6 +18,7 @@ public class Scan2 extends AppCompatActivity {
     String num;
     String time;
     String sick;
+    String data;
 
     public static final int REQUEST_CODE_SCAN3 = 203;   // Scan3 액티비티 요청 상수
     public static final int REQUEST_CODE_SCAN1 = 202;   // Scan1 액티비티 요청 상수
@@ -34,33 +35,59 @@ public class Scan2 extends AppCompatActivity {
         getIntentData(intent);
 
         if(android.os.Build.VERSION.SDK_INT >= 26) {
-            String data = scanData.substring(16);
-            id = data.substring(0, 4);
-            num = data.substring(4, 5);
-            time = data.substring(5, 16);
-            sick = data.substring(16, 17);
-            batLen = data.substring(17).split(",");
-            battery = batLen[0];
+            data = scanData.substring(16);
+            if(data.length() >= 80) {
+                id = data.substring(0, 4);
+                num = data.substring(4, 5);
+                time = data.substring(5, 16);
+                sick = data.substring(16, 17);
+                batLen = data.substring(17).split(",");
+                battery = batLen[0];
+            }else{
+                id = data.substring(0, 4);
+                num = data.substring(4, 5);
+                sick = data.substring(5, 6);
+                batLen = data.substring(6).split(",");
+                battery = batLen[0];
+            }
         }
         else {
-            String data = scanData.substring(48);
-            id = data.substring(0, 4);
-            num = data.substring(4, 5);
-            time = data.substring(5, 16);
-            sick = data.substring(16, 17);
-            batLe = data.substring(17);
-            Log.d("data", data);
-            if (batLe.length() == 2) {
-                battery = batLe.substring(0, 1);
-            } else if (batLe.length() == 3) {
-                battery = batLe.substring(0, 2);
-            } else {
-                battery = "100";
+            data = scanData.toString();
+            String[] dataSplit = data.split("패");
+            data = dataSplit[1].substring(9);
+            if(data.length() != 10) {
+                id = data.substring(0, 4);
+                num = data.substring(4, 5);
+                time = data.substring(5, 16);
+                sick = data.substring(16, 17);
+                batLe = data.substring(17);
+                Log.d("data", data);
+                if (batLe.length() == 2) {
+                    battery = batLe.substring(0, 1);
+                } else if (batLe.length() == 3) {
+                    battery = batLe.substring(0, 2);
+                } else {
+                    battery = "100";
+                }
+            }else{
+                id = data.substring(0, 4);
+                num = data.substring(4, 5);
+                sick = data.substring(5, 6);
+                batLe = data.substring(6);
+                if(batLe.equals("00")){
+                    battery = "100";
+                }else if(batLe.length() == 3){
+                    battery = batLe.substring(0, 1);
+                }else if(batLe.length() == 4){
+                    battery = batLe.substring(0, 2);
+                }
             }
         }
         textView.append("   -  회원 ID : " + id);
         textView.append("\n   -  조난인원 : " + num);
-        textView.append("\n   -  조난일시 : " + time);
+        if(data.length() != 10){
+            textView.append("\n   -  조난일시 : " + time);
+        }
         if(sick.equals("0")){
             textView.append("\n   -  현재상태 : 이상 없음");
         }
