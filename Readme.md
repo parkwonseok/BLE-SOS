@@ -8,6 +8,6 @@ BLE 신호 세기와 삼각측량법을 이용해 조난자의 위치를 찾음<
 - 프로젝트 기간<br>
 2019-03 ~ 2019-06<br><br>
 - 기술 스택<br>
-Android Studio
-BLE 4, 5
-라즈베리파이(Python)
+Android Studio<br>
+BLE 4, 5<br>
+라즈베리파이(Python)<br>
