@@ -36,6 +36,14 @@
 - Raspberry Pi
 - FireBase
 
+### 🙋🏻‍♂️ 담당 역할 
+
+- Android 개발 (80%)
+    - BLE Advertising
+    - BLE Scanning
+    - BLE Chatting
+    - UI
+
 ### 📸 결과 화면
 
 - 조난 신호 송신<br>
